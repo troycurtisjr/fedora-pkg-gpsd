@@ -1,6 +1,6 @@
 Name:           gpsd
 Version:        2.32
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Service daemon for mediating access to a GPS
 
 Group:          System Environment/Daemons
@@ -11,7 +11,7 @@ Source1:        xgps.desktop
 Source2:        xgpsspeed.desktop
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires: dbus-devel ncurses-devel xmlto python
+BuildRequires: dbus-devel dbus-glib ncurses-devel xmlto python
 BuildRequires: openmotif-devel libXaw-devel desktop-file-utils
 
 Requires(post):    /sbin/ldconfig
@@ -146,6 +146,9 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*.desktop
 
 %changelog
+* Thu Apr 13 2006 Matthew Truch <matt at truch.net> - 2.32-4
+- Add dbus-glib to BuildRequires as needed for build.
+
 * Sun Apr 9 2006 Matthew Truch <matt at truch.net> - 2.32-3
 - Include xmlto and python in buildrequires so things build right.
 - Don't package static library file.  
