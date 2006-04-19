@@ -1,6 +1,6 @@
 Name:           gpsd
 Version:        2.32
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Service daemon for mediating access to a GPS
 
 Group:          System Environment/Daemons
@@ -57,7 +57,7 @@ can run on a serial terminal or terminal emulator.
 %setup -q
 
 %build
-%configure --enable-tnt --enable-dbus --disable-static
+%configure --enable-dbus --disable-static
 make %{?_smp_mflags}
 
 %install
@@ -146,6 +146,10 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*.desktop
 
 %changelog
+* Wed Apr 19 2006 Matthew Truch <matt at truch.net> - 2.32-5
+- Don't --enable-tnt in build as it causes some gpses to not work
+  properly with sattelite view mode.  See bugzilla bug 189220.
+
 * Thu Apr 13 2006 Matthew Truch <matt at truch.net> - 2.32-4
 - Add dbus-glib to BuildRequires as needed for build.
 
