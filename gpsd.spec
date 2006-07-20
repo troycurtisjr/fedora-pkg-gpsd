@@ -1,6 +1,6 @@
 Name:           gpsd
-Version:        2.32
-Release:        5%{?dist}
+Version:        2.33
+Release:        1%{?dist}
 Summary:        Service daemon for mediating access to a GPS
 
 Group:          System Environment/Daemons
@@ -141,11 +141,18 @@ rm -rf %{buildroot}
 %{_bindir}/cgpxlogger
 %{_mandir}/man1/gps.1*
 %{_mandir}/man1/gpspipe.1*
+%{_mandir}/man1/xgps.1*
+%{_mandir}/man1/xgpsspeed.1*
+%{_mandir}/man1/cgps.1*
+%{_mandir}/man1/cgpxlogger.1*
 %{_libdir}/X11/app-defaults/xgps
 %{_libdir}/X11/app-defaults/xgpsspeed
 %{_datadir}/applications/*.desktop
 
 %changelog
+* Thu Jul 20 2006 Matthew Truch <matt at truch.net> - 2.33-1
+- Update to version 2.33
+
 * Wed Apr 19 2006 Matthew Truch <matt at truch.net> - 2.32-5
 - Don't --enable-tnt in build as it causes some gpses to not work
   properly with sattelite view mode.  See bugzilla bug 189220.
