@@ -1,6 +1,6 @@
 Name:           gpsd
 Version:        2.33
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Service daemon for mediating access to a GPS
 
 Group:          System Environment/Daemons
@@ -11,7 +11,7 @@ Source1:        xgps.desktop
 Source2:        xgpsspeed.desktop
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires: dbus-devel dbus-glib ncurses-devel xmlto python
+BuildRequires: dbus-devel dbus-glib glib-devel ncurses-devel xmlto python
 BuildRequires: openmotif-devel libXaw-devel desktop-file-utils
 
 Requires(post):    /sbin/ldconfig
@@ -150,6 +150,9 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*.desktop
 
 %changelog
+* Thu Jul 20 2006 Matthew Truch <matt at truch.net> - 2.33-2
+- Missing BR glib-devel
+
 * Thu Jul 20 2006 Matthew Truch <matt at truch.net> - 2.33-1
 - Update to version 2.33
 
