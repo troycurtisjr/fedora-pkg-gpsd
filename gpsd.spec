@@ -1,6 +1,6 @@
 Name:           gpsd
 Version:        2.33
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Service daemon for mediating access to a GPS
 
 Group:          System Environment/Daemons
@@ -150,8 +150,11 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*.desktop
 
 %changelog
+* Mon Aug 28 2006 Matthew Truch <matt at truch.net> - 2.33-4
+- Bump release for rebuild in prep. for FC6.
+
 * Thu Jul 20 2006 Matthew Truch <matt at truch.net> - 2.33-3
-* Actually, was a missing BR glib-dbus-devel.   Ooops.
+- Actually, was a missing BR glib-dbus-devel.   Ooops.
 
 * Thu Jul 20 2006 Matthew Truch <matt at truch.net> - 2.33-2
 - Missing BR glib-devel
