@@ -1,6 +1,6 @@
 Name:           gpsd
 Version:        2.33
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Service daemon for mediating access to a GPS
 
 Group:          System Environment/Daemons
@@ -12,7 +12,7 @@ Source2:        xgpsspeed.desktop
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python
-BuildRequires: openmotif-devel libXaw-devel desktop-file-utils
+BuildRequires: lesstif-devel libXaw-devel desktop-file-utils
 
 Requires(post):    /sbin/ldconfig
 Requires(postun):  /sbin/ldconfig
@@ -150,6 +150,9 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*.desktop
 
 %changelog
+* Tue Sep 26 2006 Matthew Truch <matt at truch.net> - 2.33-5
+- Remove openmotif requirment, and switch to lesstif.
+
 * Mon Aug 28 2006 Matthew Truch <matt at truch.net> - 2.33-4
 - Bump release for rebuild in prep. for FC6.
 
