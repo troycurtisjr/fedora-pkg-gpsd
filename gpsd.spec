@@ -1,6 +1,6 @@
 Name:           gpsd
 Version:        2.33
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Service daemon for mediating access to a GPS
 
 Group:          System Environment/Daemons
@@ -150,6 +150,9 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*.desktop
 
 %changelog
+* Sat Dec 9 2006 Matthew Truch <matt at truch.net> - 2.33-6
+- Rebuild to pull in new version of python.
+
 * Tue Sep 26 2006 Matthew Truch <matt at truch.net> - 2.33-5
 - Remove openmotif requirment, and switch to lesstif.
 
