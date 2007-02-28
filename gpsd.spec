@@ -1,6 +1,6 @@
 Name:           gpsd
 Version:        2.34
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Service daemon for mediating access to a GPS
 
 Group:          System Environment/Daemons
@@ -11,7 +11,7 @@ Source1:        xgps.desktop
 Source2:        xgpsspeed.desktop
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python
+BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
 BuildRequires: lesstif-devel libXaw-devel desktop-file-utils
 
 Requires(post):    /sbin/ldconfig
@@ -154,6 +154,9 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*.desktop
 
 %changelog
+* Tue Feb 27 2007 Matthew Truch <matt at truch.net> - 2.34-2
+- BR python-devel instead of python to make it build.  
+
 * Tue Feb 27 2007 Matthew Truch <matt at truch.net> - 2.34-1
 - Upgrade to 2.34.
 - Get rid of %%makeinstall (which was never needed).
