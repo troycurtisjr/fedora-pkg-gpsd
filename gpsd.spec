@@ -1,6 +1,6 @@
 Name:           gpsd
-Version:        2.33
-Release:        6%{?dist}
+Version:        2.34
+Release:        1%{?dist}
 Summary:        Service daemon for mediating access to a GPS
 
 Group:          System Environment/Daemons
@@ -53,6 +53,8 @@ to dump the package version and exit. Additionally, it accepts -rv
 cgps resembles xgps, but without the pictorial satellite display.  It
 can run on a serial terminal or terminal emulator.
 
+%{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
+
 %prep
 %setup -q
 
@@ -64,18 +66,15 @@ make %{?_smp_mflags}
 rm -rf %{buildroot}
 mkdir -p %{buildroot}
 
-%makeinstall
+make install DESTDIR=%{buildroot}
 # additional gpsd files
 mkdir -p %{buildroot}%{_libdir}/X11/app-defaults/
-cp xgps.ad %{buildroot}%{_libdir}/X11/app-defaults/xgps
-cp xgpsspeed.ad %{buildroot}%{_libdir}/X11/app-defaults/xgpsspeed
-mkdir -p %{buildroot}%{_sysconfdir}/hotplug/usb
-cp gpsd.hotplug gpsd.usermap %{buildroot}%{_sysconfdir}/hotplug/usb/
+cp -p xgps.ad %{buildroot}%{_libdir}/X11/app-defaults/xgps
+cp -p xgpsspeed.ad %{buildroot}%{_libdir}/X11/app-defaults/xgpsspeed
+mkdir -p %{buildroot}%{_sysconfdir}/hotplug.d/usb
+cp -p gpsd.hotplug gpsd.usermap %{buildroot}%{_sysconfdir}/hotplug.d/usb/
 # additional gpsd-devel files
 mkdir -p %{buildroot}%{_datadir}/gpsd
-PYVERSION=`python -c "import sys; print sys.version[:3]"`
-mkdir -p %{buildroot}%{_libdir}/python${PYVERSION}/site-packages
-cp gps.py gpsfake.py %{buildroot}%{_libdir}/python${PYVERSION}/site-packages
 
 #remove nasty little .la files
 rm -f %{buildroot}%{_libdir}/libgps.la
@@ -103,21 +102,24 @@ rm -rf %{buildroot}
 %{_sbindir}/gpsd
 %{_bindir}/gpsprof
 %{_bindir}/sirfmon
+%{_bindir}/gpsctl
 %{_libdir}/libgps.so.*
 %{_mandir}/man8/gpsd.8*
 %{_mandir}/man1/gpsprof.1*
 %{_mandir}/man1/sirfmon.1*
-%{_sysconfdir}/hotplug/usb/gpsd.hotplug
-%{_sysconfdir}/hotplug/usb/gpsd.usermap
-%{_libdir}/python*/site-packages/gps.py*
+%{_mandir}/man1/gpsctl.1*
+%{_sysconfdir}/hotplug.d/usb/gpsd.hotplug
+%{_sysconfdir}/hotplug.d/usb/gpsd.usermap
+%{python_sitelib}/gps.py*
 
 %files devel
 %defattr(-,root,root,-)
-%doc HACKING TODO
+%doc TODO
 %{_bindir}/gpsfake
 %{_bindir}/rtcmdecode
 %{_bindir}/gpsflash
-%{_libdir}/python*/site-packages/gpsfake.py*
+%{python_sitelib}/gpsfake*
+%{python_sitelib}/gpspacket.so
 %{_libdir}/libgps.so
 %{_includedir}/gps.h
 %{_includedir}/libgpsmm.h
@@ -139,17 +141,25 @@ rm -rf %{buildroot}
 %{_bindir}/gpspipe
 %{_bindir}/gpxlogger
 %{_bindir}/cgpxlogger
+%{_bindir}/gpscat
 %{_mandir}/man1/gps.1*
 %{_mandir}/man1/gpspipe.1*
 %{_mandir}/man1/xgps.1*
 %{_mandir}/man1/xgpsspeed.1*
 %{_mandir}/man1/cgps.1*
+%{_mandir}/man1/gpscat.1*
 %{_mandir}/man1/cgpxlogger.1*
 %{_libdir}/X11/app-defaults/xgps
 %{_libdir}/X11/app-defaults/xgpsspeed
 %{_datadir}/applications/*.desktop
 
 %changelog
+* Tue Feb 27 2007 Matthew Truch <matt at truch.net> - 2.34-1
+- Upgrade to 2.34.
+- Get rid of %%makeinstall (which was never needed).
+- Possibly fix hotplug issuses (BZ 219750).
+- Use %%python_sitelib for python site-files stuff.
+
 * Sat Dec 9 2006 Matthew Truch <matt at truch.net> - 2.33-6
 - Rebuild to pull in new version of python.
 
