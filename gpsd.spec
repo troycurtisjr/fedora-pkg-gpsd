@@ -1,6 +1,6 @@
 Name:           gpsd
 Version:        2.34
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Service daemon for mediating access to a GPS
 
 Group:          System Environment/Daemons
@@ -154,6 +154,9 @@ rm -rf %{buildroot}
 %{_datadir}/applications/*.desktop
 
 %changelog
+* Tue Mar 20 2007 Michael Schwendt <mschwendt[AT]users.sf.net> - 2.34-3
+- Bump release for FE5 -> Fedora 7 upgrade path.
+
 * Tue Feb 27 2007 Matthew Truch <matt at truch.net> - 2.34-2
 - BR python-devel instead of python to make it build.  
 
