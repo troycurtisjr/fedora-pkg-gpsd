@@ -1,6 +1,6 @@
 Name:           gpsd
 Version:        2.34
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Service daemon for mediating access to a GPS
 
 Group:          System Environment/Daemons
@@ -9,6 +9,7 @@ URL:            http://developer.berlios.de/projects/gpsd/
 Source0:        http://download.berlios.de/gpsd/%{name}-%{version}.tar.gz
 Source1:        xgps.desktop
 Source2:        xgpsspeed.desktop
+Source3:        gpsd-logo.png
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
@@ -89,7 +90,7 @@ desktop-file-install --vendor fedora                        \
 
 #Install logo icon for .desktop files
 mkdir -p %{buildroot}%{_datadir}/gpsd
-cp -p gpsd-logo.png %{buildroot}%{_datadir}/gpsd/gpsd-logo.png
+cp -p %{SOURCE3} %{buildroot}%{_datadir}/gpsd/gpsd-logo.png
 
 %clean
 rm -rf %{buildroot}
@@ -158,6 +159,10 @@ rm -rf %{buildroot}
 %{_datadir}/gpsd/gpsd-logo.png
 
 %changelog
+* Sat Jun 30 2007 Matthew Truch <matt at truch.net> - 2.34-7
+- Make sure the logo is actually included (via the spec file).
+  I need to wake up before I try even trivial updates.  
+
 * Sat Jun 30 2007 Matthew Truch <matt at truch.net> - 2.34-6
 - Learn how to use search and replace (aka fix all instances of
   gpsd-logo.png spelled incorrectly as gspd-logo.png).
