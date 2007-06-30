@@ -1,6 +1,6 @@
 Name:           gpsd
 Version:        2.34
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Service daemon for mediating access to a GPS
 
 Group:          System Environment/Daemons
@@ -89,7 +89,7 @@ desktop-file-install --vendor fedora                        \
 
 #Install logo icon for .desktop files
 mkdir -p %{buildroot}%{_datadir}/gpsd
-cp -p gspd-logo.png %{buildroot}%{_datadir}/gpsd/gspd-logo.png
+cp -p gpsd-logo.png %{buildroot}%{_datadir}/gpsd/gpsd-logo.png
 
 %clean
 rm -rf %{buildroot}
@@ -158,6 +158,10 @@ rm -rf %{buildroot}
 %{_datadir}/gpsd/gpsd-logo.png
 
 %changelog
+* Sat Jun 30 2007 Matthew Truch <matt at truch.net> - 2.34-6
+- Learn how to use search and replace (aka fix all instances of
+  gpsd-logo.png spelled incorrectly as gspd-logo.png).
+
 * Sat Jun 30 2007 Matthew Truch <matt at truch.net> - 2.34-5
 - Fix desktop file and logo file name.
 
