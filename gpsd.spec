@@ -1,6 +1,6 @@
 Name:           gpsd
 Version:        2.34
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Service daemon for mediating access to a GPS
 
 Group:          System Environment/Daemons
@@ -73,8 +73,6 @@ cp -p xgps.ad %{buildroot}%{_libdir}/X11/app-defaults/xgps
 cp -p xgpsspeed.ad %{buildroot}%{_libdir}/X11/app-defaults/xgpsspeed
 mkdir -p %{buildroot}%{_sysconfdir}/hotplug.d/usb
 cp -p gpsd.hotplug gpsd.usermap %{buildroot}%{_sysconfdir}/hotplug.d/usb/
-# additional gpsd-devel files
-mkdir -p %{buildroot}%{_datadir}/gpsd
 
 #remove nasty little .la files
 rm -f %{buildroot}%{_libdir}/libgps.la
@@ -88,6 +86,10 @@ desktop-file-install --vendor fedora                        \
     --dir %{buildroot}%{_datadir}/applications              \
     --add-category X-Fedora                                 \
     %{SOURCE2}
+
+#Install logo icon for .desktop files
+mkdir -p %{buildroot}%{_datadir}/gpsd
+cp -p gspd-logo.png %{buildroot}%{_datadir}/gpsd/gspd-logo.png
 
 %clean
 rm -rf %{buildroot}
@@ -152,8 +154,13 @@ rm -rf %{buildroot}
 %{_libdir}/X11/app-defaults/xgps
 %{_libdir}/X11/app-defaults/xgpsspeed
 %{_datadir}/applications/*.desktop
+%dir %{_datadir}/gpsd
+%{_datadir}/gpsd/gspd-logo.png
 
 %changelog
+* Sat Jun 30 2007 Matthew Truch <matt at truch.net> - 2.34-4
+- Include icon for .desktop files per BZ 241428
+
 * Tue Mar 20 2007 Michael Schwendt <mschwendt[AT]users.sf.net> - 2.34-3
 - Bump release for FE5 -> Fedora 7 upgrade path.
 
