@@ -1,6 +1,6 @@
 Name:           gpsd
 Version:        2.34
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Service daemon for mediating access to a GPS
 
 Group:          System Environment/Daemons
@@ -155,9 +155,12 @@ rm -rf %{buildroot}
 %{_libdir}/X11/app-defaults/xgpsspeed
 %{_datadir}/applications/*.desktop
 %dir %{_datadir}/gpsd
-%{_datadir}/gpsd/gspd-logo.png
+%{_datadir}/gpsd/gpsd-logo.png
 
 %changelog
+* Sat Jun 30 2007 Matthew Truch <matt at truch.net> - 2.34-5
+- Fix desktop file and logo file name.
+
 * Sat Jun 30 2007 Matthew Truch <matt at truch.net> - 2.34-4
 - Include icon for .desktop files per BZ 241428
 
