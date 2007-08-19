@@ -1,6 +1,6 @@
 Name:           gpsd
 Version:        2.34
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Service daemon for mediating access to a GPS
 
 Group:          System Environment/Daemons
@@ -10,6 +10,7 @@ Source0:        http://download.berlios.de/gpsd/%{name}-%{version}.tar.gz
 Source1:        xgps.desktop
 Source2:        xgpsspeed.desktop
 Source3:        gpsd-logo.png
+Patch:          install-gpsd_config.h.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
@@ -58,6 +59,7 @@ can run on a serial terminal or terminal emulator.
 
 %prep
 %setup -q
+%patch -p1
 
 %build
 %configure --enable-dbus --disable-static
@@ -127,6 +129,7 @@ rm -rf %{buildroot}
 %{_includedir}/gps.h
 %{_includedir}/libgpsmm.h
 %{_includedir}/gpsd.h
+%{_includedir}/gpsd_config.h
 %{_mandir}/man1/gpsfake.1*
 %{_mandir}/man1/rtcmdecode.1*
 %{_mandir}/man1/gpsflash.1*
@@ -159,6 +162,10 @@ rm -rf %{buildroot}
 %{_datadir}/gpsd/gpsd-logo.png
 
 %changelog
+* Sun Aug 19 2007 Matthew Truch <matt at truch.net> - 2.34-8
+- Patch Makefile to also install gpsd_config.h as needed by
+  libgpsmm.h.  Redhat BZ 253433.
+
 * Sat Jun 30 2007 Matthew Truch <matt at truch.net> - 2.34-7
 - Make sure the logo is actually included (via the spec file).
   I need to wake up before I try even trivial updates.  
