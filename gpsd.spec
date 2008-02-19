@@ -1,6 +1,6 @@
 Name:           gpsd
 Version:        2.34
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Service daemon for mediating access to a GPS
 
 Group:          System Environment/Daemons
@@ -162,6 +162,9 @@ rm -rf %{buildroot}
 %{_datadir}/gpsd/gpsd-logo.png
 
 %changelog
+* Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 2.34-9
+- Autorebuild for GCC 4.3
+
 * Sun Aug 19 2007 Matthew Truch <matt at truch.net> - 2.34-8
 - Patch Makefile to also install gpsd_config.h as needed by
   libgpsmm.h.  Redhat BZ 253433.
