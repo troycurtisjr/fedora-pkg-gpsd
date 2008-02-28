@@ -1,23 +1,25 @@
-Name:           gpsd
-Version:        2.34
-Release:        9%{?dist}
-Summary:        Service daemon for mediating access to a GPS
+%{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 
-Group:          System Environment/Daemons
-License:        BSD
-URL:            http://developer.berlios.de/projects/gpsd/
-Source0:        http://download.berlios.de/gpsd/%{name}-%{version}.tar.gz
-Source1:        xgps.desktop
-Source2:        xgpsspeed.desktop
-Source3:        gpsd-logo.png
-Patch:          install-gpsd_config.h.patch
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Name: gpsd
+Version: 2.37
+Release: 1%{?dist}
+Summary: Service daemon for mediating access to a GPS
+
+Group: System Environment/Daemons
+License: BSD
+URL: http://developer.berlios.de/projects/gpsd/
+Source0: http://download.berlios.de/gpsd/%{name}-%{version}.tar.gz
+Source1: xgps.desktop
+Source2: xgpsspeed.desktop
+Source3: gpsd-logo.png
+Patch0: python-pyexecdir-install-gpsd-2.37.patch
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
 BuildRequires: lesstif-devel libXaw-devel desktop-file-utils
 
-Requires(post):    /sbin/ldconfig
-Requires(postun):  /sbin/ldconfig
+Requires(post): /sbin/ldconfig
+Requires(postun): /sbin/ldconfig
 
 %description 
 gpsd is a service daemon that mediates access to a GPS sensor
@@ -30,17 +32,18 @@ gpsd responds to queries with a format that is substantially easier to
 parse than NMEA 0183.  
 
 %package devel
-Summary:        Client libraries in C and Python for talking to a running gpsd or GPS
-Group:          Development/Libraries
-Requires:       %{name} = %{version}-%{release}
+Summary: Client libraries in C and Python for talking to a running gpsd or GPS
+Group: Development/Libraries
+Requires: %{name} = %{version}-%{release}
+Requires: pkgconfig
 
 %description devel
-This package provides C header files for the gpsd shared libraries
-that manage access to a GPS for applications; also Python modules.
+This package provides C header files and python modules for the gpsd shared 
+libraries that manage access to a GPS for applications
 
-%package        clients
-Summary:        Clients for gpsd
-Group:          Applications/System
+%package clients
+Summary: Clients for gpsd
+Group: Applications/System
 
 %description clients
 xgps is a simple test client for gpsd with an X interface. It displays
@@ -55,51 +58,67 @@ to dump the package version and exit. Additionally, it accepts -rv
 cgps resembles xgps, but without the pictorial satellite display.  It
 can run on a serial terminal or terminal emulator.
 
-%{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 %prep
 %setup -q
-%patch -p1
+%patch0 -p1
+
 
 %build
 %configure --enable-dbus --disable-static
+sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
+sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 make %{?_smp_mflags}
+
 
 %install
 rm -rf %{buildroot}
-mkdir -p %{buildroot}
+make DESTDIR=%{buildroot} install
 
-make install DESTDIR=%{buildroot}
-# additional gpsd files
-mkdir -p %{buildroot}%{_libdir}/X11/app-defaults/
-cp -p xgps.ad %{buildroot}%{_libdir}/X11/app-defaults/xgps
-cp -p xgpsspeed.ad %{buildroot}%{_libdir}/X11/app-defaults/xgpsspeed
-mkdir -p %{buildroot}%{_sysconfdir}/hotplug.d/usb
-cp -p gpsd.hotplug gpsd.usermap %{buildroot}%{_sysconfdir}/hotplug.d/usb/
+# X11 defaults
+%{__install} -d -m 0755 %{buildroot}%{_datadir}/X11/app-defaults/
+%{__install} -p -m 0644 xgps.ad %{buildroot}%{_datadir}/X11/app-defaults/xgps
+%{__install} -p -m 0644 xgpsspeed.ad \
+	%{buildroot}%{_datadir}/X11/app-defaults/xgpsspeed
 
-#remove nasty little .la files
+# hotplug script
+%{__install} -d -m 0755 %{buildroot}%{_sysconfdir}/hotplug.d/usb
+%{__install} -p -m 0644 gpsd.hotplug gpsd.usermap \
+	%{buildroot}%{_sysconfdir}/hotplug.d/usb/
+
+# remove .la files
 rm -f %{buildroot}%{_libdir}/libgps.la
 
-#Install the .desktop files
-desktop-file-install --vendor fedora                        \
-    --dir %{buildroot}%{_datadir}/applications              \
-    --add-category X-Fedora                                 \
-    %{SOURCE1}
-desktop-file-install --vendor fedora                        \
-    --dir %{buildroot}%{_datadir}/applications              \
-    --add-category X-Fedora                                 \
-    %{SOURCE2}
+# fix non-executable libraries
+%{__chmod} +x %{buildroot}%{_libdir}/libgps.so.17.0.0
+%{__chmod} +x %{buildroot}%{python_sitearch}/gpspacket.so
 
-#Install logo icon for .desktop files
-mkdir -p %{buildroot}%{_datadir}/gpsd
-cp -p %{SOURCE3} %{buildroot}%{_datadir}/gpsd/gpsd-logo.png
+# fix non-executable python script
+%{__chmod} +x %{buildroot}%{python_sitearch}/gps.py
+
+# Install the .desktop files
+desktop-file-install --vendor fedora \
+	--dir %{buildroot}%{_datadir}/applications \
+	--add-category X-Fedora \
+	%{SOURCE1}
+desktop-file-install --vendor fedora \
+	--dir %{buildroot}%{_datadir}/applications \
+	--add-category X-Fedora \
+	%{SOURCE2}
+
+# Install logo icon for .desktop files
+%{__install} -d -m 0755 %{buildroot}%{_datadir}/gpsd
+%{__install} -p -m 0644 %{SOURCE3} %{buildroot}%{_datadir}/gpsd/gpsd-logo.png
+
 
 %clean
 rm -rf %{buildroot}
 
+
 %post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
+
 
 %files
 %defattr(-,root,root,-)
@@ -109,13 +128,13 @@ rm -rf %{buildroot}
 %{_bindir}/sirfmon
 %{_bindir}/gpsctl
 %{_libdir}/libgps.so.*
+%{python_sitearch}/gps.py*
 %{_mandir}/man8/gpsd.8*
 %{_mandir}/man1/gpsprof.1*
 %{_mandir}/man1/sirfmon.1*
 %{_mandir}/man1/gpsctl.1*
 %{_sysconfdir}/hotplug.d/usb/gpsd.hotplug
 %{_sysconfdir}/hotplug.d/usb/gpsd.usermap
-%{python_sitelib}/gps.py*
 
 %files devel
 %defattr(-,root,root,-)
@@ -123,13 +142,13 @@ rm -rf %{buildroot}
 %{_bindir}/gpsfake
 %{_bindir}/rtcmdecode
 %{_bindir}/gpsflash
-%{python_sitelib}/gpsfake*
-%{python_sitelib}/gpspacket.so
 %{_libdir}/libgps.so
+%{_libdir}/pkgconfig/*.pc
+%{python_sitearch}/gpsfake*
+%{python_sitearch}/gpspacket.so
 %{_includedir}/gps.h
 %{_includedir}/libgpsmm.h
 %{_includedir}/gpsd.h
-%{_includedir}/gpsd_config.h
 %{_mandir}/man1/gpsfake.1*
 %{_mandir}/man1/rtcmdecode.1*
 %{_mandir}/man1/gpsflash.1*
@@ -155,13 +174,24 @@ rm -rf %{buildroot}
 %{_mandir}/man1/cgps.1*
 %{_mandir}/man1/gpscat.1*
 %{_mandir}/man1/cgpxlogger.1*
-%{_libdir}/X11/app-defaults/xgps
-%{_libdir}/X11/app-defaults/xgpsspeed
+%{_datadir}/X11/app-defaults/xgps
+%{_datadir}/X11/app-defaults/xgpsspeed
 %{_datadir}/applications/*.desktop
 %dir %{_datadir}/gpsd
 %{_datadir}/gpsd/gpsd-logo.png
 
+
 %changelog
+* Wed Feb 27 2008 Douglas E. Warner <silfreed@silfreed.net> - 2.37-1
+- update to 2.37
+- removed install-gpsd_config.h.patch
+- installed pkgconfig files in devel package
+- added patch to install python modules in sitearch
+- removing rpath from inclucded libtool
+- moving X11 app-defaults to datadir
+- using macros for commands in install; using install instead of cp and mkdir
+- cleaning up spaces/tabs for rpmlint
+
 * Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 2.34-9
 - Autorebuild for GCC 4.3
 
@@ -205,7 +235,7 @@ rm -rf %{buildroot}
 - Bump release for rebuild in prep. for FC6.
 
 * Thu Jul 20 2006 Matthew Truch <matt at truch.net> - 2.33-3
-- Actually, was a missing BR glib-dbus-devel.   Ooops.
+- Actually, was a missing BR glib-dbus-devel. Ooops.
 
 * Thu Jul 20 2006 Matthew Truch <matt at truch.net> - 2.33-2
 - Missing BR glib-devel

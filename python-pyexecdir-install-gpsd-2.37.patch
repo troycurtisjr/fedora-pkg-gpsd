@@ -1,0 +1,97 @@
+diff -ruN gpsd-2.37/Makefile.in gpsd-2.37-new/Makefile.in
+--- gpsd-2.37/Makefile.in	2008-02-17 12:41:06.000000000 -0500
++++ gpsd-2.37-new/Makefile.in	2008-02-28 11:45:00.000000000 -0500
+@@ -77,7 +77,7 @@
+ am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
+ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
+ 	"$(DESTDIR)$(sbindir)" "$(DESTDIR)$(bindir)" \
+-	"$(DESTDIR)$(pythondir)" "$(DESTDIR)$(pythondir)" \
++	"$(DESTDIR)$(pyexecdir)" "$(DESTDIR)$(pyexecdir)" \
+ 	"$(DESTDIR)$(man1dir)" "$(DESTDIR)$(man3dir)" \
+ 	"$(DESTDIR)$(man5dir)" "$(DESTDIR)$(man8dir)" \
+ 	"$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(includedir)" \
+@@ -966,21 +966,21 @@
+ uninstall-info-am:
+ install-nodist_pythonPYTHON: $(nodist_python_PYTHON)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(pythondir)" || $(mkdir_p) "$(DESTDIR)$(pythondir)"
++	test -z "$(pyexecdir)" || $(mkdir_p) "$(DESTDIR)$(pyexecdir)"
+ 	@list='$(nodist_python_PYTHON)'; dlist=''; for p in $$list; do\
+ 	  if test -f "$$p"; then b=; else b="$(srcdir)/"; fi; \
+ 	  if test -f $$b$$p; then \
+ 	    f=$(am__strip_dir) \
+ 	    dlist="$$dlist $$f"; \
+-	    echo " $(nodist_pythonPYTHON_INSTALL) '$$b$$p' '$(DESTDIR)$(pythondir)/$$f'"; \
+-	    $(nodist_pythonPYTHON_INSTALL) "$$b$$p" "$(DESTDIR)$(pythondir)/$$f"; \
++	    echo " $(nodist_pythonPYTHON_INSTALL) '$$b$$p' '$(DESTDIR)$(pyexecdir)/$$f'"; \
++	    $(nodist_pythonPYTHON_INSTALL) "$$b$$p" "$(DESTDIR)$(pyexecdir)/$$f"; \
+ 	  else :; fi; \
+ 	done; \
+ 	if test -n "$$dlist"; then \
+ 	  if test -z "$(DESTDIR)"; then \
+-	    PYTHON=$(PYTHON) $(py_compile) --basedir "$(pythondir)" $$dlist; \
++	    PYTHON=$(PYTHON) $(py_compile) --basedir "$(pyexecdir)" $$dlist; \
+ 	  else \
+-	    PYTHON=$(PYTHON) $(py_compile) --destdir "$(DESTDIR)" --basedir "$(pythondir)" $$dlist; \
++	    PYTHON=$(PYTHON) $(py_compile) --destdir "$(DESTDIR)" --basedir "$(pyexecdir)" $$dlist; \
+ 	  fi; \
+ 	else :; fi
+ 
+@@ -988,27 +988,27 @@
+ 	@$(NORMAL_UNINSTALL)
+ 	@list='$(nodist_python_PYTHON)'; dlist=''; for p in $$list; do\
+ 	  f=$(am__strip_dir) \
+-	  rm -f "$(DESTDIR)$(pythondir)/$$f"; \
+-	  rm -f "$(DESTDIR)$(pythondir)/$${f}c"; \
+-	  rm -f "$(DESTDIR)$(pythondir)/$${f}o"; \
++	  rm -f "$(DESTDIR)$(pyexecdir)/$$f"; \
++	  rm -f "$(DESTDIR)$(pyexecdir)/$${f}c"; \
++	  rm -f "$(DESTDIR)$(pyexecdir)/$${f}o"; \
+ 	done
+ install-pythonPYTHON: $(python_PYTHON)
+ 	@$(NORMAL_INSTALL)
+-	test -z "$(pythondir)" || $(mkdir_p) "$(DESTDIR)$(pythondir)"
++	test -z "$(pyexecdir)" || $(mkdir_p) "$(DESTDIR)$(pyexecdir)"
+ 	@list='$(python_PYTHON)'; dlist=''; for p in $$list; do\
+ 	  if test -f "$$p"; then b=; else b="$(srcdir)/"; fi; \
+ 	  if test -f $$b$$p; then \
+ 	    f=$(am__strip_dir) \
+ 	    dlist="$$dlist $$f"; \
+-	    echo " $(pythonPYTHON_INSTALL) '$$b$$p' '$(DESTDIR)$(pythondir)/$$f'"; \
+-	    $(pythonPYTHON_INSTALL) "$$b$$p" "$(DESTDIR)$(pythondir)/$$f"; \
++	    echo " $(pythonPYTHON_INSTALL) '$$b$$p' '$(DESTDIR)$(pyexecdir)/$$f'"; \
++	    $(pythonPYTHON_INSTALL) "$$b$$p" "$(DESTDIR)$(pyexecdir)/$$f"; \
+ 	  else :; fi; \
+ 	done; \
+ 	if test -n "$$dlist"; then \
+ 	  if test -z "$(DESTDIR)"; then \
+-	    PYTHON=$(PYTHON) $(py_compile) --basedir "$(pythondir)" $$dlist; \
++	    PYTHON=$(PYTHON) $(py_compile) --basedir "$(pyexecdir)" $$dlist; \
+ 	  else \
+-	    PYTHON=$(PYTHON) $(py_compile) --destdir "$(DESTDIR)" --basedir "$(pythondir)" $$dlist; \
++	    PYTHON=$(PYTHON) $(py_compile) --destdir "$(DESTDIR)" --basedir "$(pyexecdir)" $$dlist; \
+ 	  fi; \
+ 	else :; fi
+ 
+@@ -1016,9 +1016,9 @@
+ 	@$(NORMAL_UNINSTALL)
+ 	@list='$(python_PYTHON)'; dlist=''; for p in $$list; do\
+ 	  f=$(am__strip_dir) \
+-	  rm -f "$(DESTDIR)$(pythondir)/$$f"; \
+-	  rm -f "$(DESTDIR)$(pythondir)/$${f}c"; \
+-	  rm -f "$(DESTDIR)$(pythondir)/$${f}o"; \
++	  rm -f "$(DESTDIR)$(pyexecdir)/$$f"; \
++	  rm -f "$(DESTDIR)$(pyexecdir)/$${f}c"; \
++	  rm -f "$(DESTDIR)$(pyexecdir)/$${f}o"; \
+ 	done
+ install-man1: $(man1_MANS) $(man_MANS)
+ 	@$(NORMAL_INSTALL)
+@@ -1436,7 +1436,7 @@
+ install-binPROGRAMS: install-libLTLIBRARIES
+ 
+ installdirs:
+-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(sbindir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pythondir)" "$(DESTDIR)$(pythondir)" "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(man3dir)" "$(DESTDIR)$(man5dir)" "$(DESTDIR)$(man8dir)" "$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(includedir)" "$(DESTDIR)$(includedir)"; do \
++	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(sbindir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pyexecdir)" "$(DESTDIR)$(pyexecdir)" "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(man3dir)" "$(DESTDIR)$(man5dir)" "$(DESTDIR)$(man8dir)" "$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(includedir)" "$(DESTDIR)$(includedir)"; do \
+ 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
+ 	done
+ install: $(BUILT_SOURCES)
