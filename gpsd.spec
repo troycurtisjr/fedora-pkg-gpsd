@@ -2,7 +2,7 @@
 
 Name: gpsd
 Version: 2.37
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -13,10 +13,12 @@ Source1: xgps.desktop
 Source2: xgpsspeed.desktop
 Source3: gpsd-logo.png
 Patch0: python-pyexecdir-install-gpsd-2.37.patch
+Patch1: zero.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
 BuildRequires: lesstif-devel libXaw-devel desktop-file-utils
+BuildRequires: python
 
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
@@ -62,6 +64,7 @@ can run on a serial terminal or terminal emulator.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p0
 
 
 %build
@@ -129,6 +132,7 @@ rm -rf %{buildroot}
 %{_bindir}/gpsctl
 %{_libdir}/libgps.so.*
 %{python_sitearch}/gps.py*
+%{python_sitearch}/gpspacket.so
 %{_mandir}/man8/gpsd.8*
 %{_mandir}/man1/gpsprof.1*
 %{_mandir}/man1/sirfmon.1*
@@ -145,7 +149,6 @@ rm -rf %{buildroot}
 %{_libdir}/libgps.so
 %{_libdir}/pkgconfig/*.pc
 %{python_sitearch}/gpsfake*
-%{python_sitearch}/gpspacket.so
 %{_includedir}/gps.h
 %{_includedir}/libgpsmm.h
 %{_includedir}/gpsd.h
@@ -182,6 +185,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Mar 19 2008 Douglas E. Warner <silfreed@silfreed.net> - 2.37-2
+- moving gpspacket.so python lib to main package
+- adding zero.patch to make ZEROIZE error go away on fedora 7
+
 * Wed Feb 27 2008 Douglas E. Warner <silfreed@silfreed.net> - 2.37-1
 - update to 2.37
 - removed install-gpsd_config.h.patch
