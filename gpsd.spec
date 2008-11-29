@@ -2,7 +2,7 @@
 
 Name: gpsd
 Version: 2.37
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -185,6 +185,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sat Nov 29 2008 Ignacio Vazquez-Abrams <ivazqueznet+rpm@gmail.com> - 2.37-3
+- Rebuild for Python 2.6
+
 * Wed Mar 19 2008 Douglas E. Warner <silfreed@silfreed.net> - 2.37-2
 - moving gpspacket.so python lib to main package
 - adding zero.patch to make ZEROIZE error go away on fedora 7
