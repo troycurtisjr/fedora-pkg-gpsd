@@ -1,8 +1,8 @@
 %{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 
 Name: gpsd
-Version: 2.37
-Release: 4%{?dist}
+Version: 2.38
+Release: 2%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -12,14 +12,18 @@ Source0: http://download.berlios.de/gpsd/%{name}-%{version}.tar.gz
 Source1: xgps.desktop
 Source2: xgpsspeed.desktop
 Source3: gpsd-logo.png
-Patch0: python-pyexecdir-install-gpsd-2.37.patch
-Patch1: zero.patch
+Source10: gpsd.init
+Source11: gpsd.sysconfig
+Source20: gpsd.rules
+Source21: gpsd.hotplug.wrapper
+Patch0: python-pyexecdir-install-gpsd-2.38.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
 BuildRequires: lesstif-devel libXaw-devel desktop-file-utils
 BuildRequires: python
 
+Requires: udev
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 
@@ -64,7 +68,6 @@ can run on a serial terminal or terminal emulator.
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p0
 
 
 %build
@@ -84,10 +87,24 @@ make DESTDIR=%{buildroot} install
 %{__install} -p -m 0644 xgpsspeed.ad \
 	%{buildroot}%{_datadir}/X11/app-defaults/xgpsspeed
 
+# init scripts
+%{__install} -d -m 0755 %{buildroot}%{_sysconfdir}/init.d
+%{__install} -p -m 0644 %{SOURCE10} \
+	%{buildroot}%{_sysconfdir}/init.d/gpsd
+
+%{__install} -d -m 0755 %{buildroot}%{_sysconfdir}/sysconfig
+%{__install} -p -m 0644 %{SOURCE11} \
+	%{buildroot}%{_sysconfdir}/sysconfig/gpsd
+
+# udev rules
+%{__install} -d -m 0755 %{buildroot}%{_sysconfdir}/udev/rules.d
+%{__install} -p -m 0644 %{SOURCE20} \
+	%{buildroot}%{_sysconfdir}/udev/rules.d/99-gpsd.rules
+
 # hotplug script
-%{__install} -d -m 0755 %{buildroot}%{_sysconfdir}/hotplug.d/usb
-%{__install} -p -m 0644 gpsd.hotplug gpsd.usermap \
-	%{buildroot}%{_sysconfdir}/hotplug.d/usb/
+%{__install} -d -m 0755 %{buildroot}/lib/udev
+%{__install} -p -m 0755 gpsd.hotplug %{SOURCE21} \
+	%{buildroot}/lib/udev
 
 # remove .la files
 rm -f %{buildroot}%{_libdir}/libgps.la
@@ -126,19 +143,23 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root,-)
 %doc README INSTALL COPYING
+%config(noreplace) %{_sysconfdir}/init.d/%{name}
+%config(noreplace) %{_sysconfdir}/sysconfig/%{name}
+%config(noreplace) %{_sysconfdir}/udev/rules.d/*
 %{_sbindir}/gpsd
 %{_bindir}/gpsprof
 %{_bindir}/sirfmon
 %{_bindir}/gpsctl
 %{_libdir}/libgps.so.*
+/lib/udev/gpsd*
 %{python_sitearch}/gps.py*
+%{python_sitearch}/gpscap.py*
+%{python_sitearch}/gpslib.so
 %{python_sitearch}/gpspacket.so
 %{_mandir}/man8/gpsd.8*
 %{_mandir}/man1/gpsprof.1*
 %{_mandir}/man1/sirfmon.1*
 %{_mandir}/man1/gpsctl.1*
-%{_sysconfdir}/hotplug.d/usb/gpsd.hotplug
-%{_sysconfdir}/hotplug.d/usb/gpsd.usermap
 
 %files devel
 %defattr(-,root,root,-)
@@ -166,6 +187,7 @@ rm -rf %{buildroot}
 %{_bindir}/xgps
 %{_bindir}/xgpsspeed
 %{_bindir}/cgps
+%{_bindir}/gpsdlcdd
 %{_bindir}/gpspipe
 %{_bindir}/gpxlogger
 %{_bindir}/cgpxlogger
@@ -185,6 +207,30 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Mar 16 2009 Douglas E. Warner <silfreed@silfreed.net> - 2.38-2
+- updating to 2.38
+- creating init script and sysconfig files
+- migrating hotplug rules to udev + hotplug wrapper script from svn r5147
+- updating pyexecdir patch
+- fixing udev rule subsystem match
+- Regression test load for RoyalTek RGM3800 and Blumax GPS-009 added
+- Scaling on E error-estimate fields fixed to match O
+- Listen on localhost only by default to avoid security problems; this can be
+  overridden with the -G command-line option
+- The packet-state machine can now recognize RTCM3 packets, though support is
+  not yet complete
+- Added support for ublox5 and mkt-3301 devices
+- Add a wrapper around gpsd_hexdump to save CPU
+- Lots of little fixes to various packet parsers
+- Always keep the device open: "-n" is not optional any more
+- xgpsspeed no longer depends on Motif
+- gpsctl can now ship arbitrary payloads to a device; 
+  It's possible to send binary through the control channel with the
+  new "&" command
+- Experimental new driver for Novatel SuperStarII
+- The 'g' mode switch command now requires, and returns, 'rtcm104v2' rather
+  than 'rtcm104'; this is design forward for when RTCM104v2 is fully working
+
 * Tue Feb 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.37-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
 
@@ -193,7 +239,6 @@ rm -rf %{buildroot}
 
 * Wed Mar 19 2008 Douglas E. Warner <silfreed@silfreed.net> - 2.37-2
 - moving gpspacket.so python lib to main package
-- adding zero.patch to make ZEROIZE error go away on fedora 7
 
 * Wed Feb 27 2008 Douglas E. Warner <silfreed@silfreed.net> - 2.37-1
 - update to 2.37

@@ -1,7 +1,7 @@
-diff -ruN gpsd-2.37/Makefile.in gpsd-2.37-new/Makefile.in
---- gpsd-2.37/Makefile.in	2008-02-17 12:41:06.000000000 -0500
-+++ gpsd-2.37-new/Makefile.in	2008-02-28 11:45:00.000000000 -0500
-@@ -77,7 +77,7 @@
+diff -ruN gpsd-2.38-orig/Makefile.in gpsd-2.38/Makefile.in
+--- gpsd-2.38-orig/Makefile.in	2009-02-10 15:44:43.000000000 -0500
++++ gpsd-2.38/Makefile.in	2009-02-12 11:04:18.000000000 -0500
+@@ -75,7 +75,7 @@
  am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
  am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
  	"$(DESTDIR)$(sbindir)" "$(DESTDIR)$(bindir)" \
@@ -10,12 +10,12 @@ diff -ruN gpsd-2.37/Makefile.in gpsd-2.37-new/Makefile.in
  	"$(DESTDIR)$(man1dir)" "$(DESTDIR)$(man3dir)" \
  	"$(DESTDIR)$(man5dir)" "$(DESTDIR)$(man8dir)" \
  	"$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(includedir)" \
-@@ -966,21 +966,21 @@
- uninstall-info-am:
+@@ -1005,21 +1005,21 @@
+ 	-rm -f libtool
  install-nodist_pythonPYTHON: $(nodist_python_PYTHON)
  	@$(NORMAL_INSTALL)
--	test -z "$(pythondir)" || $(mkdir_p) "$(DESTDIR)$(pythondir)"
-+	test -z "$(pyexecdir)" || $(mkdir_p) "$(DESTDIR)$(pyexecdir)"
+-	test -z "$(pythondir)" || $(MKDIR_P) "$(DESTDIR)$(pythondir)"
++	test -z "$(pyexecdir)" || $(MKDIR_P) "$(DESTDIR)$(pyexecdir)"
  	@list='$(nodist_python_PYTHON)'; dlist=''; for p in $$list; do\
  	  if test -f "$$p"; then b=; else b="$(srcdir)/"; fi; \
  	  if test -f $$b$$p; then \
@@ -37,7 +37,7 @@ diff -ruN gpsd-2.37/Makefile.in gpsd-2.37-new/Makefile.in
  	  fi; \
  	else :; fi
  
-@@ -988,27 +988,27 @@
+@@ -1027,27 +1027,27 @@
  	@$(NORMAL_UNINSTALL)
  	@list='$(nodist_python_PYTHON)'; dlist=''; for p in $$list; do\
  	  f=$(am__strip_dir) \
@@ -50,8 +50,8 @@ diff -ruN gpsd-2.37/Makefile.in gpsd-2.37-new/Makefile.in
  	done
  install-pythonPYTHON: $(python_PYTHON)
  	@$(NORMAL_INSTALL)
--	test -z "$(pythondir)" || $(mkdir_p) "$(DESTDIR)$(pythondir)"
-+	test -z "$(pyexecdir)" || $(mkdir_p) "$(DESTDIR)$(pyexecdir)"
+-	test -z "$(pythondir)" || $(MKDIR_P) "$(DESTDIR)$(pythondir)"
++	test -z "$(pyexecdir)" || $(MKDIR_P) "$(DESTDIR)$(pyexecdir)"
  	@list='$(python_PYTHON)'; dlist=''; for p in $$list; do\
  	  if test -f "$$p"; then b=; else b="$(srcdir)/"; fi; \
  	  if test -f $$b$$p; then \
@@ -73,7 +73,7 @@ diff -ruN gpsd-2.37/Makefile.in gpsd-2.37-new/Makefile.in
  	  fi; \
  	else :; fi
  
-@@ -1016,9 +1016,9 @@
+@@ -1055,9 +1055,9 @@
  	@$(NORMAL_UNINSTALL)
  	@list='$(python_PYTHON)'; dlist=''; for p in $$list; do\
  	  f=$(am__strip_dir) \
@@ -86,12 +86,12 @@ diff -ruN gpsd-2.37/Makefile.in gpsd-2.37-new/Makefile.in
  	done
  install-man1: $(man1_MANS) $(man_MANS)
  	@$(NORMAL_INSTALL)
-@@ -1436,7 +1436,7 @@
+@@ -1478,7 +1478,7 @@
  install-binPROGRAMS: install-libLTLIBRARIES
  
  installdirs:
 -	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(sbindir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pythondir)" "$(DESTDIR)$(pythondir)" "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(man3dir)" "$(DESTDIR)$(man5dir)" "$(DESTDIR)$(man8dir)" "$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(includedir)" "$(DESTDIR)$(includedir)"; do \
 +	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(sbindir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pyexecdir)" "$(DESTDIR)$(pyexecdir)" "$(DESTDIR)$(man1dir)" "$(DESTDIR)$(man3dir)" "$(DESTDIR)$(man5dir)" "$(DESTDIR)$(man8dir)" "$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(includedir)" "$(DESTDIR)$(includedir)"; do \
- 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
+ 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
  	done
  install: $(BUILT_SOURCES)
