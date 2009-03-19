@@ -1,8 +1,8 @@
 %{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 
 Name: gpsd
-Version: 2.38
-Release: 2%{?dist}
+Version: 2.39
+Release: 1%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -14,7 +14,6 @@ Source2: xgpsspeed.desktop
 Source3: gpsd-logo.png
 Source10: gpsd.init
 Source11: gpsd.sysconfig
-Source20: gpsd.rules
 Source21: gpsd.hotplug.wrapper
 Patch0: python-pyexecdir-install-gpsd-2.38.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -25,6 +24,9 @@ BuildRequires: python
 
 Requires: udev
 Requires(post): /sbin/ldconfig
+Requires(post): /sbin/chkconfig
+Requires(preun): initscripts
+Requires(preun): /sbin/chkconfig
 Requires(postun): /sbin/ldconfig
 
 %description 
@@ -89,7 +91,7 @@ make DESTDIR=%{buildroot} install
 
 # init scripts
 %{__install} -d -m 0755 %{buildroot}%{_sysconfdir}/init.d
-%{__install} -p -m 0644 %{SOURCE10} \
+%{__install} -p -m 0755 %{SOURCE10} \
 	%{buildroot}%{_sysconfdir}/init.d/gpsd
 
 %{__install} -d -m 0755 %{buildroot}%{_sysconfdir}/sysconfig
@@ -98,7 +100,7 @@ make DESTDIR=%{buildroot} install
 
 # udev rules
 %{__install} -d -m 0755 %{buildroot}%{_sysconfdir}/udev/rules.d
-%{__install} -p -m 0644 %{SOURCE20} \
+%{__install} -p -m 0644 gpsd.rules \
 	%{buildroot}%{_sysconfdir}/udev/rules.d/99-gpsd.rules
 
 # hotplug script
@@ -106,11 +108,14 @@ make DESTDIR=%{buildroot} install
 %{__install} -p -m 0755 gpsd.hotplug %{SOURCE21} \
 	%{buildroot}/lib/udev
 
+# create new gpxlogger man page
+%{__cp} -p %{buildroot}%{_mandir}/man1/cgpxlogger.1 \
+	%{buildroot}%{_mandir}/man1/gpxlogger.1
+
 # remove .la files
 rm -f %{buildroot}%{_libdir}/libgps.la
 
 # fix non-executable libraries
-%{__chmod} +x %{buildroot}%{_libdir}/libgps.so.17.0.0
 %{__chmod} +x %{buildroot}%{python_sitearch}/gpspacket.so
 
 # fix non-executable python script
@@ -135,7 +140,15 @@ desktop-file-install --vendor fedora \
 rm -rf %{buildroot}
 
 
-%post -p /sbin/ldconfig
+%post
+/sbin/ldconfig
+/sbin/chkconfig --add %{name}
+
+%preun
+if [ $1 = 0 ]; then
+	/sbin/service %{name} stop > /dev/null 2>&1 || true
+	/sbin/chkconfig --del %{name}
+fi
 
 %postun -p /sbin/ldconfig
 
@@ -148,7 +161,7 @@ rm -rf %{buildroot}
 %config(noreplace) %{_sysconfdir}/udev/rules.d/*
 %{_sbindir}/gpsd
 %{_bindir}/gpsprof
-%{_bindir}/sirfmon
+%{_bindir}/gpsmon
 %{_bindir}/gpsctl
 %{_libdir}/libgps.so.*
 /lib/udev/gpsd*
@@ -158,14 +171,13 @@ rm -rf %{buildroot}
 %{python_sitearch}/gpspacket.so
 %{_mandir}/man8/gpsd.8*
 %{_mandir}/man1/gpsprof.1*
-%{_mandir}/man1/sirfmon.1*
+%{_mandir}/man1/gpsmon.1*
 %{_mandir}/man1/gpsctl.1*
 
 %files devel
 %defattr(-,root,root,-)
 %doc TODO
 %{_bindir}/gpsfake
-%{_bindir}/rtcmdecode
 %{_bindir}/gpsflash
 %{_libdir}/libgps.so
 %{_libdir}/pkgconfig/*.pc
@@ -174,7 +186,6 @@ rm -rf %{buildroot}
 %{_includedir}/libgpsmm.h
 %{_includedir}/gpsd.h
 %{_mandir}/man1/gpsfake.1*
-%{_mandir}/man1/rtcmdecode.1*
 %{_mandir}/man1/gpsflash.1*
 %{_mandir}/man3/libgps.3*
 %{_mandir}/man3/libgpsmm.3*
@@ -184,21 +195,23 @@ rm -rf %{buildroot}
 
 %files clients
 %defattr(-,root,root,-)
-%{_bindir}/xgps
-%{_bindir}/xgpsspeed
 %{_bindir}/cgps
-%{_bindir}/gpsdlcdd
+%{_bindir}/gpscat
+%{_bindir}/gpsdecode
 %{_bindir}/gpspipe
 %{_bindir}/gpxlogger
-%{_bindir}/cgpxlogger
-%{_bindir}/gpscat
+%{_bindir}/lcdgps
+%{_bindir}/xgps
+%{_bindir}/xgpsspeed
+%{_mandir}/man1/cgpxlogger.1*
 %{_mandir}/man1/gps.1*
+%{_mandir}/man1/gpsdecode.1*
 %{_mandir}/man1/gpspipe.1*
+%{_mandir}/man1/gpxlogger.1*
 %{_mandir}/man1/xgps.1*
 %{_mandir}/man1/xgpsspeed.1*
 %{_mandir}/man1/cgps.1*
 %{_mandir}/man1/gpscat.1*
-%{_mandir}/man1/cgpxlogger.1*
 %{_datadir}/X11/app-defaults/xgps
 %{_datadir}/X11/app-defaults/xgpsspeed
 %{_datadir}/applications/*.desktop
@@ -207,7 +220,26 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Mon Mar 16 2009 Douglas E. Warner <silfreed@silfreed.net> - 2.38-2
+* Thu Mar 19 2009 Douglas E. Warner <silfreed@silfreed.net> - 2.39-1
+- updating to 2.39
+- fixed potential core dump in C client handling of "K" responses
+- Made device hotplugging work again; had been broken by changes in udev
+- Introduced major and minor API version symbols into the public interfaces
+- The sirfmon utility is gone, replaced by gpsmon which does the same job
+  for multiple GPS types
+- Fixed a two-year old error in NMEA parsing that nobody noticed because its
+  only effect was to trash VDOP values from GSA sentences, and gpsd computes
+  those with an internal error model when they look wonky
+- cgpxlogger has been merged into gpxlogger
+- Speed-setting commands now allow parity and stop-bit setting if the GPS
+  chipset and adaptor can support it
+- Specfile and other packaging paraphenalia now live in a packaging
+  subdirectory
+- rtcmdecode becomes gpsdecode and can now de-armor and dump AIDVM packets
+- The client library now work correctly in locales where the decimal separator
+  is not a period
+
+* Thu Feb 12 2009 Douglas E. Warner <silfreed@silfreed.net> - 2.38-1
 - updating to 2.38
 - creating init script and sysconfig files
 - migrating hotplug rules to udev + hotplug wrapper script from svn r5147
