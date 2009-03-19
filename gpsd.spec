@@ -239,7 +239,7 @@ fi
 - The client library now work correctly in locales where the decimal separator
   is not a period
 
-* Thu Feb 12 2009 Douglas E. Warner <silfreed@silfreed.net> - 2.38-1
+* Mon Mar 16 2009 Douglas E. Warner <silfreed@silfreed.net> - 2.38-1
 - updating to 2.38
 - creating init script and sysconfig files
 - migrating hotplug rules to udev + hotplug wrapper script from svn r5147
