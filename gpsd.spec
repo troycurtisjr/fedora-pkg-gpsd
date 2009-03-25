@@ -2,7 +2,7 @@
 
 Name: gpsd
 Version: 2.39
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -16,6 +16,7 @@ Source10: gpsd.init
 Source11: gpsd.sysconfig
 Source21: gpsd.hotplug.wrapper
 Patch0: python-pyexecdir-install-gpsd-2.38.patch
+Patch1: parallel-make-dependencies.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
@@ -70,6 +71,7 @@ can run on a serial terminal or terminal emulator.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 
 %build
@@ -220,6 +222,9 @@ fi
 
 
 %changelog
+* Wed Mar 25 2009 Douglas E. Warner <silfreed@silfreed.net> - 2.39-2
+- adding patch to try to fix parallel make errors
+
 * Thu Mar 19 2009 Douglas E. Warner <silfreed@silfreed.net> - 2.39-1
 - updating to 2.39
 - fixed potential core dump in C client handling of "K" responses
