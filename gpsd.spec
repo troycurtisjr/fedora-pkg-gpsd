@@ -75,9 +75,12 @@ can run on a serial terminal or terminal emulator.
 
 
 %build
-%configure --enable-dbus --disable-static
-sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
-sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
+%configure \
+	--disable-rpath \
+	--enable-dbus \
+	--disable-static
+sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' ltmain.sh
+sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' ltmain.sh
 make %{?_smp_mflags}
 
 
