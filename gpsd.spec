@@ -213,6 +213,7 @@ fi
 %{_mandir}/man1/gpsdecode.1*
 %{_mandir}/man1/gpspipe.1*
 %{_mandir}/man1/gpxlogger.1*
+%{_mandir}/man1/lcdpgs.1*
 %{_mandir}/man1/xgps.1*
 %{_mandir}/man1/xgpsspeed.1*
 %{_mandir}/man1/cgps.1*
