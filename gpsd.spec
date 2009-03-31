@@ -2,7 +2,7 @@
 
 Name: gpsd
 Version: 2.39
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -17,6 +17,8 @@ Source11: gpsd.sysconfig
 Source21: gpsd.hotplug.wrapper
 Patch0: python-pyexecdir-install-gpsd-2.38.patch
 Patch1: parallel-make-dependencies.patch
+# Viking needs this header file to be able to build
+Patch2:	gpsd-2.39-install-gpsdclient-header.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
@@ -72,7 +74,7 @@ can run on a serial terminal or terminal emulator.
 %setup -q
 %patch0 -p1
 %patch1 -p1
-
+%patch2 -p1
 
 %build
 %configure \
@@ -190,6 +192,7 @@ fi
 %{_includedir}/gps.h
 %{_includedir}/libgpsmm.h
 %{_includedir}/gpsd.h
+%{_includedir}/gpsdclient.h
 %{_mandir}/man1/gpsfake.1*
 %{_mandir}/man1/gpsflash.1*
 %{_mandir}/man3/libgps.3*
@@ -226,6 +229,10 @@ fi
 
 
 %changelog
+* Tue Mar 31 2009 Tom "spot" Callaway <tcallawa@redhat.com> - 2.39-3
+- some of the gpsd client bits went into gpsdclient.h, but that file wasn't getting installed
+  specifically, viking needs that header to build. 
+
 * Wed Mar 25 2009 Douglas E. Warner <silfreed@silfreed.net> - 2.39-2
 - adding patch to try to fix parallel make errors
 
