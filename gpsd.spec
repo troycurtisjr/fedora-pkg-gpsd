@@ -2,7 +2,7 @@
 
 Name: gpsd
 Version: 2.39
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -229,6 +229,9 @@ fi
 
 
 %changelog
+* Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.39-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+
 * Tue Mar 31 2009 Tom "spot" Callaway <tcallawa@redhat.com> - 2.39-3
 - some of the gpsd client bits went into gpsdclient.h, but that file wasn't getting installed
   specifically, viking needs that header to build. 
