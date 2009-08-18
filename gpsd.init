@@ -29,20 +29,20 @@
 # Source function library.
 . /etc/rc.d/init.d/functions
 
-exec="/usr/bin/gpsd"
+exec="/usr/sbin/gpsd"
 prog=$(basename $exec)
 PIDFILE=/var/run/gpsd.pid
 CONTROL_SOCKET=/var/run/gpsd.sock
 
 [ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
-OPTIONS="-n"
-DEVICE="/dev/ttyUSB0"
+: ${OPTIONS:=-n}
+: ${DEVICE:=/dev/ttyUSB0}
 
 lockfile=/var/lock/subsys/$prog
 
 start() {
     echo -n $"Starting $prog: "
-    daemon $exec -p $PIDFILE -F $CONTROL_SOCKET $OPTIONS $DEVICE
+    daemon $exec -P $PIDFILE -F $CONTROL_SOCKET $OPTIONS $DEVICE
     retval=$?
     echo
     [ $retval -eq 0 ] && touch $lockfile

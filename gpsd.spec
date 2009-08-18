@@ -2,7 +2,7 @@
 
 Name: gpsd
 Version: 2.39
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -229,6 +229,9 @@ fi
 
 
 %changelog
+* Wed Aug 12 2009 Marek Mahut <mmahut@fedoraproject.org> - 2.39-5
+- RHBZ#505588: gpsd has a broken initscript that fails to launch daemon
+
 * Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.39-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
 
