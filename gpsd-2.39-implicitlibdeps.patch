@@ -1,0 +1,21 @@
+diff -up gpsd-2.39/Makefile.in.implicitlibdeps gpsd-2.39/Makefile.in
+--- gpsd-2.39/Makefile.in.implicitlibdeps	2010-02-15 12:51:28.000000000 +0100
++++ gpsd-2.39/Makefile.in	2010-02-15 12:56:31.000000000 +0100
+@@ -331,7 +331,7 @@ XP_LIBS = @XP_LIBS@
+ XT_LIBS = @XT_LIBS@
+ X_CFLAGS = @X_CFLAGS@
+ X_EXTRA_LIBS = @X_EXTRA_LIBS@
+-X_LIBS = @X_LIBS@
++X_LIBS = @X_LIBS@ -lX11
+ X_PRE_LIBS = @X_PRE_LIBS@
+ abs_builddir = @abs_builddir@
+ abs_srcdir = @abs_srcdir@
+@@ -446,7 +446,7 @@ xgpsspeed_SOURCES = \
+ 	$(xgpsspeed_c_sources) \
+ 	xgpsspeed.icon
+ 
+-xgpsspeed_LDADD = $(LIBM) $(LIBC) $(LIBNSL) $(LIBSOCKET) $(XAW_LIBS) $(X_LIBS) $(X_PRE_LIBS) libgps.la -lm $(LIBPTHREAD)
++xgpsspeed_LDADD = $(LIBM) $(LIBC) $(LIBNSL) $(LIBSOCKET) $(XAW_LIBS) $(XT_LIBS) $(X_LIBS) $(X_PRE_LIBS) libgps.la -lm $(LIBPTHREAD)
+ 
+ #
+ # Build cgps

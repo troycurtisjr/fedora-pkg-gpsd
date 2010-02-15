@@ -1,8 +1,8 @@
-%{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
+%{!?python_sitearch: %global python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 
 Name: gpsd
 Version: 2.39
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -19,6 +19,7 @@ Patch0: python-pyexecdir-install-gpsd-2.38.patch
 Patch1: parallel-make-dependencies.patch
 # Viking needs this header file to be able to build
 Patch2:	gpsd-2.39-install-gpsdclient-header.patch
+Patch3:	gpsd-2.39-implicitlibdeps.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
@@ -75,6 +76,7 @@ can run on a serial terminal or terminal emulator.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 %configure \
@@ -229,6 +231,10 @@ fi
 
 
 %changelog
+* Mon Feb 15 2010 Miroslav Lichvar <mlichvar@redhat.com> - 2.39-6
+- fix linking with --no-add-needed (#564662)
+- use %%global macro instead of %%define
+
 * Wed Aug 12 2009 Marek Mahut <mmahut@fedoraproject.org> - 2.39-5
 - RHBZ#505588: gpsd has a broken initscript that fails to launch daemon
 
