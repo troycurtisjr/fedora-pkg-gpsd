@@ -41,6 +41,7 @@ CONTROL_SOCKET=/var/run/gpsd.sock
 lockfile=/var/lock/subsys/$prog
 
 start() {
+    [ "$EUID" != "0" ] && exit 4
     echo -n $"Starting $prog: "
     daemon $exec -P $PIDFILE -F $CONTROL_SOCKET $OPTIONS $DEVICE
     retval=$?
@@ -50,6 +51,7 @@ start() {
 }
 
 stop() {
+    [ "$EUID" != "0" ] && exit 4
     echo -n $"Stopping $prog: "
     killproc $prog
     retval=$?

@@ -2,7 +2,7 @@
 
 Name: gpsd
 Version: 2.39
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -77,6 +77,8 @@ can run on a serial terminal or terminal emulator.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+
+sed -i 's/SYSFS/ATTRS/g' gpsd.rules
 
 %build
 %configure \
@@ -231,6 +233,10 @@ fi
 
 
 %changelog
+* Tue Mar 02 2010 Miroslav Lichvar <mlichvar@redhat.com> - 2.39-7
+- don't use deprecated SYSFS{} in udev rules (#569089)
+- fix init script LSB compliance
+
 * Mon Feb 15 2010 Miroslav Lichvar <mlichvar@redhat.com> - 2.39-6
 - fix linking with --no-add-needed (#564662)
 - use %%global macro instead of %%define
