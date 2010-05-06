@@ -1,8 +1,8 @@
 %{!?python_sitearch: %global python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 
 Name: gpsd
-Version: 2.39
-Release: 7%{?dist}
+Version: 2.94
+Release: 1%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -15,16 +15,11 @@ Source3: gpsd-logo.png
 Source10: gpsd.init
 Source11: gpsd.sysconfig
 Source21: gpsd.hotplug.wrapper
-Patch0: python-pyexecdir-install-gpsd-2.38.patch
-Patch1: parallel-make-dependencies.patch
-# Viking needs this header file to be able to build
-Patch2:	gpsd-2.39-install-gpsdclient-header.patch
-Patch3:	gpsd-2.39-implicitlibdeps.patch
+Patch0: gpsd-2.94-silentmake.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
-BuildRequires: lesstif-devel libXaw-devel desktop-file-utils
-BuildRequires: python
+BuildRequires: libXaw-devel desktop-file-utils
 
 Requires: udev
 Requires(post): /sbin/ldconfig
@@ -73,30 +68,24 @@ can run on a serial terminal or terminal emulator.
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-
-sed -i 's/SYSFS/ATTRS/g' gpsd.rules
+%patch0 -p1 -b .silentmake
 
 %build
 %configure \
-	--disable-rpath \
 	--enable-dbus \
 	--disable-static
-sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' ltmain.sh
-sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' ltmain.sh
+sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
+sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
+
 make %{?_smp_mflags}
 
 
 %install
 rm -rf %{buildroot}
-make DESTDIR=%{buildroot} install
+make DESTDIR=%{buildroot} pythondir=%{python_sitearch} install
 
 # X11 defaults
 %{__install} -d -m 0755 %{buildroot}%{_datadir}/X11/app-defaults/
-%{__install} -p -m 0644 xgps.ad %{buildroot}%{_datadir}/X11/app-defaults/xgps
 %{__install} -p -m 0644 xgpsspeed.ad \
 	%{buildroot}%{_datadir}/X11/app-defaults/xgpsspeed
 
@@ -119,18 +108,11 @@ make DESTDIR=%{buildroot} install
 %{__install} -p -m 0755 gpsd.hotplug %{SOURCE21} \
 	%{buildroot}/lib/udev
 
-# create new gpxlogger man page
-%{__cp} -p %{buildroot}%{_mandir}/man1/cgpxlogger.1 \
-	%{buildroot}%{_mandir}/man1/gpxlogger.1
-
 # remove .la files
-rm -f %{buildroot}%{_libdir}/libgps.la
-
-# fix non-executable libraries
-%{__chmod} +x %{buildroot}%{python_sitearch}/gpspacket.so
+rm -f %{buildroot}%{_libdir}/libgps*.la
 
 # fix non-executable python script
-%{__chmod} +x %{buildroot}%{python_sitearch}/gps.py
+%{__chmod} +x %{buildroot}%{python_sitearch}/gps/gps.py
 
 # Install the .desktop files
 desktop-file-install --vendor fedora \
@@ -174,12 +156,10 @@ fi
 %{_bindir}/gpsprof
 %{_bindir}/gpsmon
 %{_bindir}/gpsctl
-%{_libdir}/libgps.so.*
+%{_libdir}/libgps*.so.*
 /lib/udev/gpsd*
-%{python_sitearch}/gps.py*
-%{python_sitearch}/gpscap.py*
-%{python_sitearch}/gpslib.so
-%{python_sitearch}/gpspacket.so
+%{python_sitearch}/gps*
+%exclude %{python_sitearch}/gps/fake*
 %{_mandir}/man8/gpsd.8*
 %{_mandir}/man1/gpsprof.1*
 %{_mandir}/man1/gpsmon.1*
@@ -189,16 +169,13 @@ fi
 %defattr(-,root,root,-)
 %doc TODO
 %{_bindir}/gpsfake
-%{_bindir}/gpsflash
-%{_libdir}/libgps.so
+%{_libdir}/libgps*.so
 %{_libdir}/pkgconfig/*.pc
-%{python_sitearch}/gpsfake*
+%{python_sitearch}/gps/fake*
 %{_includedir}/gps.h
 %{_includedir}/libgpsmm.h
 %{_includedir}/gpsd.h
-%{_includedir}/gpsdclient.h
 %{_mandir}/man1/gpsfake.1*
-%{_mandir}/man1/gpsflash.1*
 %{_mandir}/man3/libgps.3*
 %{_mandir}/man3/libgpsmm.3*
 %{_mandir}/man3/libgpsd.3*
@@ -215,17 +192,14 @@ fi
 %{_bindir}/lcdgps
 %{_bindir}/xgps
 %{_bindir}/xgpsspeed
-%{_mandir}/man1/cgpxlogger.1*
 %{_mandir}/man1/gps.1*
 %{_mandir}/man1/gpsdecode.1*
 %{_mandir}/man1/gpspipe.1*
-%{_mandir}/man1/gpxlogger.1*
 %{_mandir}/man1/lcdgps.1*
 %{_mandir}/man1/xgps.1*
 %{_mandir}/man1/xgpsspeed.1*
 %{_mandir}/man1/cgps.1*
 %{_mandir}/man1/gpscat.1*
-%{_datadir}/X11/app-defaults/xgps
 %{_datadir}/X11/app-defaults/xgpsspeed
 %{_datadir}/applications/*.desktop
 %dir %{_datadir}/gpsd
@@ -233,6 +207,9 @@ fi
 
 
 %changelog
+* Thu May 06 2010 Miroslav Lichvar <mlichvar@redhat.com> - 2.94-1
+- update to 2.94 (#556642)
+
 * Tue Mar 02 2010 Miroslav Lichvar <mlichvar@redhat.com> - 2.39-7
 - don't use deprecated SYSFS{} in udev rules (#569089)
 - fix init script LSB compliance
