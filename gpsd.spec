@@ -1,7 +1,7 @@
 %{!?python_sitearch: %global python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
 
 Name: gpsd
-Version: 2.94
+Version: 2.95
 Release: 1%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
@@ -9,17 +9,14 @@ Group: System Environment/Daemons
 License: BSD
 URL: http://developer.berlios.de/projects/gpsd/
 Source0: http://download.berlios.de/gpsd/%{name}-%{version}.tar.gz
-Source1: xgps.desktop
-Source2: xgpsspeed.desktop
-Source3: gpsd-logo.png
 Source10: gpsd.init
 Source11: gpsd.sysconfig
-Source21: gpsd.hotplug.wrapper
-Patch0: gpsd-2.94-silentmake.patch
+Patch0: gpsd-2.95-silentmake.patch
+Patch1: gpsd-2.95-hotplugvars.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
-BuildRequires: libXaw-devel desktop-file-utils
+BuildRequires: libusb1-devel desktop-file-utils
 
 Requires: udev
 Requires(post): /sbin/ldconfig
@@ -69,10 +66,12 @@ can run on a serial terminal or terminal emulator.
 %prep
 %setup -q
 %patch0 -p1 -b .silentmake
+%patch1 -p1 -b .hotplugvars
 
 %build
 %configure \
 	--enable-dbus \
+	--disable-libQgpsmm \
 	--disable-static
 sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
 sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
@@ -83,11 +82,6 @@ make %{?_smp_mflags}
 %install
 rm -rf %{buildroot}
 make DESTDIR=%{buildroot} pythondir=%{python_sitearch} install
-
-# X11 defaults
-%{__install} -d -m 0755 %{buildroot}%{_datadir}/X11/app-defaults/
-%{__install} -p -m 0644 xgpsspeed.ad \
-	%{buildroot}%{_datadir}/X11/app-defaults/xgpsspeed
 
 # init scripts
 %{__install} -d -m 0755 %{buildroot}%{_sysconfdir}/init.d
@@ -105,8 +99,7 @@ make DESTDIR=%{buildroot} pythondir=%{python_sitearch} install
 
 # hotplug script
 %{__install} -d -m 0755 %{buildroot}/lib/udev
-%{__install} -p -m 0755 gpsd.hotplug %{SOURCE21} \
-	%{buildroot}/lib/udev
+%{__install} -p -m 0755 gpsd.hotplug gpsd.hotplug.wrapper %{buildroot}/lib/udev
 
 # remove .la files
 rm -f %{buildroot}%{_libdir}/libgps*.la
@@ -118,15 +111,15 @@ rm -f %{buildroot}%{_libdir}/libgps*.la
 desktop-file-install --vendor fedora \
 	--dir %{buildroot}%{_datadir}/applications \
 	--add-category X-Fedora \
-	%{SOURCE1}
+	packaging/X11/xgps.desktop
 desktop-file-install --vendor fedora \
 	--dir %{buildroot}%{_datadir}/applications \
 	--add-category X-Fedora \
-	%{SOURCE2}
+	packaging/X11/xgpsspeed.desktop
 
 # Install logo icon for .desktop files
 %{__install} -d -m 0755 %{buildroot}%{_datadir}/gpsd
-%{__install} -p -m 0644 %{SOURCE3} %{buildroot}%{_datadir}/gpsd/gpsd-logo.png
+%{__install} -p -m 0644 packaging/X11/gpsd-logo.png %{buildroot}%{_datadir}/gpsd/gpsd-logo.png
 
 
 %clean
@@ -200,13 +193,18 @@ fi
 %{_mandir}/man1/xgpsspeed.1*
 %{_mandir}/man1/cgps.1*
 %{_mandir}/man1/gpscat.1*
-%{_datadir}/X11/app-defaults/xgpsspeed
 %{_datadir}/applications/*.desktop
 %dir %{_datadir}/gpsd
 %{_datadir}/gpsd/gpsd-logo.png
 
 
 %changelog
+* Thu Jul 15 2010 Miroslav Lichvar <mlichvar@redhat.com> - 2.95-1
+- update to 2.95
+- add /usr/sbin to PATH in gpsd.hotplug.wrapper
+- pass sysconfig variables to gpsd started from udev
+- enable libusb support
+
 * Thu May 06 2010 Miroslav Lichvar <mlichvar@redhat.com> - 2.94-1
 - update to 2.94 (#556642)
 
