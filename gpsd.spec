@@ -2,7 +2,7 @@
 
 Name: gpsd
 Version: 2.95
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -199,6 +199,9 @@ fi
 
 
 %changelog
+* Wed Jul 21 2010 David Malcolm <dmalcolm@redhat.com> - 2.95-2
+- Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild
+
 * Thu Jul 15 2010 Miroslav Lichvar <mlichvar@redhat.com> - 2.95-1
 - update to 2.95
 - add /usr/sbin to PATH in gpsd.hotplug.wrapper
