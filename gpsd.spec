@@ -2,7 +2,7 @@
 
 Name: gpsd
 Version: 2.95
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -16,7 +16,10 @@ Patch1: gpsd-2.95-hotplugvars.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
-BuildRequires: libusb1-devel desktop-file-utils
+%ifnarch s390 s390x
+BuildRequires: libusb1-devel
+%endif
+BuildRequires: desktop-file-utils
 
 Requires: udev
 Requires(post): /sbin/ldconfig
@@ -199,6 +202,9 @@ fi
 
 
 %changelog
+* Fri Aug 27 2010 Dan Horák <dan[at]danny.cz> - 2.95-3
+- no USB on s390(x)
+
 * Wed Jul 21 2010 David Malcolm <dmalcolm@redhat.com> - 2.95-2
 - Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild
 
