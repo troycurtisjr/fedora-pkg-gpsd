@@ -2,7 +2,7 @@
 
 Name: gpsd
 Version: 2.95
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -13,6 +13,7 @@ Source10: gpsd.init
 Source11: gpsd.sysconfig
 Patch0: gpsd-2.95-silentmake.patch
 Patch1: gpsd-2.95-hotplugvars.patch
+Patch2: gpsd-2.95-gpscatnoarg.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
@@ -70,6 +71,7 @@ can run on a serial terminal or terminal emulator.
 %setup -q
 %patch0 -p1 -b .silentmake
 %patch1 -p1 -b .hotplugvars
+%patch2 -p1 -b .gpscatnoarg
 
 %build
 %configure \
@@ -202,6 +204,9 @@ fi
 
 
 %changelog
+* Tue Sep 14 2010 Miroslav Lichvar <mlichvar@redhat.com> - 2.95-4
+- don't crash in gpscat when started without arguments (#633117)
+
 * Fri Aug 27 2010 Dan Horák <dan[at]danny.cz> - 2.95-3
 - no USB on s390(x)
 
