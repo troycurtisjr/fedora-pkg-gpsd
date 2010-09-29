@@ -2,7 +2,7 @@
 
 Name: gpsd
 Version: 2.95
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -204,6 +204,9 @@ fi
 
 
 %changelog
+* Wed Sep 29 2010 jkeating - 2.95-5
+- Rebuilt for gcc bug 634757
+
 * Tue Sep 14 2010 Miroslav Lichvar <mlichvar@redhat.com> - 2.95-4
 - don't crash in gpscat when started without arguments (#633117)
 
