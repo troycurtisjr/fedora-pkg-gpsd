@@ -2,7 +2,7 @@
 
 Name: gpsd
 Version: 2.95
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -204,6 +204,9 @@ fi
 
 
 %changelog
+* Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.95-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
 * Wed Sep 29 2010 jkeating - 2.95-5
 - Rebuilt for gcc bug 634757
 
