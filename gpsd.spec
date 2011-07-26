@@ -9,7 +9,7 @@ Group: System Environment/Daemons
 License: BSD
 URL: http://developer.berlios.de/projects/gpsd/
 Source0: http://download.berlios.de/gpsd/%{name}-%{version}.tar.gz
-Source10: gpsd.init
+Source10: gpsd.service
 Source11: gpsd.sysconfig
 Patch0: gpsd-2.95-silentmake.patch
 Patch1: gpsd-2.95-hotplugvars.patch
@@ -24,10 +24,8 @@ BuildRequires: desktop-file-utils
 
 Requires: %{name}-libs = %{version}-%{release}
 Requires: udev
-Requires(post): /sbin/ldconfig
-Requires(post): /sbin/chkconfig
-Requires(preun): initscripts
-Requires(preun): /sbin/chkconfig
+Requires(post): /sbin/ldconfig systemd-units
+Requires(preun): systemd-units
 Requires(postun): /sbin/ldconfig
 
 %description 
@@ -97,10 +95,10 @@ make %{?_smp_mflags}
 rm -rf %{buildroot}
 make DESTDIR=%{buildroot} pythondir=%{python_sitearch} install
 
-# init scripts
-%{__install} -d -m 0755 %{buildroot}%{_sysconfdir}/init.d
+# service files
+%{__install} -d -m 0755 %{buildroot}/lib/systemd/system
 %{__install} -p -m 0755 %{SOURCE10} \
-	%{buildroot}%{_sysconfdir}/init.d/gpsd
+	%{buildroot}/lib/systemd/system/gpsd.service
 
 %{__install} -d -m 0755 %{buildroot}%{_sysconfdir}/sysconfig
 %{__install} -p -m 0644 %{SOURCE11} \
@@ -142,13 +140,18 @@ rm -rf %{buildroot}
 
 %post
 /sbin/ldconfig
-/sbin/chkconfig --add %{name}
+/bin/systemctl daemon-reload &> /dev/null
+if [ -f %{_initrddir}/%{name} ] && /sbin/chkconfig --level 3 %{name}; then
+        /bin/systemctl enable %{name}.service &> /dev/null
+fi
+:
 
 %preun
 if [ $1 = 0 ]; then
-	/sbin/service %{name} stop > /dev/null 2>&1 || true
-	/sbin/chkconfig --del %{name}
+	/bin/systemctl --no-reload disable %{name}.service &> /dev/null
+	/bin/systemctl stop %{name}.service &> /dev/null
 fi
+:
 
 %postun -p /sbin/ldconfig
 
@@ -156,13 +159,13 @@ fi
 %files
 %defattr(-,root,root,-)
 %doc README INSTALL COPYING
-%config(noreplace) %{_sysconfdir}/init.d/%{name}
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 %config(noreplace) %{_sysconfdir}/udev/rules.d/*
 %{_sbindir}/gpsd
 %{_bindir}/gpsprof
 %{_bindir}/gpsmon
 %{_bindir}/gpsctl
+/lib/systemd/system/gpsd.service
 /lib/udev/gpsd*
 %{_mandir}/man8/gpsd.8*
 %{_mandir}/man1/gpsprof.1*
