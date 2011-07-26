@@ -22,6 +22,7 @@ BuildRequires: libusb1-devel
 %endif
 BuildRequires: desktop-file-utils
 
+Requires: %{name}-libs = %{version}-%{release}
 Requires: udev
 Requires(post): /sbin/ldconfig
 Requires(post): /sbin/chkconfig
@@ -39,10 +40,18 @@ can share access to a GPS without contention or loss of data.  Also,
 gpsd responds to queries with a format that is substantially easier to
 parse than NMEA 0183.  
 
-%package devel
+%package libs
 Summary: Client libraries in C and Python for talking to a running gpsd or GPS
+Group: System Environment/Libraries
+
+%description libs
+This package contains the gpsd libraries and python modules that manage access
+to a GPS for applications.
+
+%package devel
+Summary: Development files for the gpsd library
 Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
+Requires: %{name}-libs = %{version}-%{release}
 Requires: pkgconfig
 
 %description devel
@@ -154,14 +163,17 @@ fi
 %{_bindir}/gpsprof
 %{_bindir}/gpsmon
 %{_bindir}/gpsctl
-%{_libdir}/libgps*.so.*
 /lib/udev/gpsd*
-%{python_sitearch}/gps*
-%exclude %{python_sitearch}/gps/fake*
 %{_mandir}/man8/gpsd.8*
 %{_mandir}/man1/gpsprof.1*
 %{_mandir}/man1/gpsmon.1*
 %{_mandir}/man1/gpsctl.1*
+
+%files libs
+%defattr(-,root,root,-)
+%{_libdir}/libgps*.so.*
+%{python_sitearch}/gps*
+%exclude %{python_sitearch}/gps/fake*
 
 %files devel
 %defattr(-,root,root,-)
