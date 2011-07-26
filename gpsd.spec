@@ -2,7 +2,7 @@
 
 Name: gpsd
 Version: 2.95
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -219,6 +219,11 @@ fi
 
 
 %changelog
+* Tue Jul 26 2011 Miroslav Lichvar <mlichvar@redhat.com> - 2.95-7
+- make -libs subpackage (#663124)
+- replace SysV initscript with systemd service (#717419)
+- explicitly set USBAUTO=true in sysconfig file
+
 * Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.95-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
