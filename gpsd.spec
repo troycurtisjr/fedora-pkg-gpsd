@@ -96,7 +96,7 @@ make DESTDIR=%{buildroot} pythondir=%{python_sitearch} install
 
 # service files
 %{__install} -d -m 0755 %{buildroot}/lib/systemd/system
-%{__install} -p -m 0755 %{SOURCE10} \
+%{__install} -p -m 0644 %{SOURCE10} \
 	%{buildroot}/lib/systemd/system/gpsd.service
 
 %{__install} -d -m 0755 %{buildroot}%{_sysconfdir}/sysconfig
