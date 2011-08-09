@@ -24,9 +24,8 @@ BuildRequires: desktop-file-utils
 
 Requires: %{name}-libs = %{version}-%{release}
 Requires: udev
-Requires(post): /sbin/ldconfig systemd-units
+Requires(post): systemd-units
 Requires(preun): systemd-units
-Requires(postun): /sbin/ldconfig
 
 %description 
 gpsd is a service daemon that mediates access to a GPS sensor
@@ -139,7 +138,6 @@ rm -rf %{buildroot}
 
 
 %post
-/sbin/ldconfig
 /bin/systemctl daemon-reload &> /dev/null
 if [ -f %{_initrddir}/%{name} ] && /sbin/chkconfig --level 3 %{name}; then
         /bin/systemctl enable %{name}.service &> /dev/null
@@ -153,7 +151,10 @@ if [ $1 = 0 ]; then
 fi
 :
 
-%postun -p /sbin/ldconfig
+%post libs -p /sbin/ldconfig
+
+
+%postun libs -p /sbin/ldconfig
 
 
 %files
