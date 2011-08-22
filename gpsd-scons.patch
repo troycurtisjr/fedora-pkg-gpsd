@@ -1,0 +1,54 @@
+diff -up gpsd-3.0/SConstruct.scons gpsd-3.0/SConstruct
+--- gpsd-3.0/SConstruct.scons	2011-08-19 07:36:28.000000000 +0200
++++ gpsd-3.0/SConstruct	2011-08-22 16:35:20.763702823 +0200
+@@ -155,7 +155,7 @@ for i in ["AR", "ARFLAGS", "CCFLAGS", "C
+         j = i
+         if i == "LD":
+             i = "SHLINK"
+-        env[j]=os.getenv(i)
++        env[j]=Split(os.getenv(i))
+ for flags in ["LDFLAGS", "CPPFLAGS"]:
+     if os.environ.has_key(flags):
+         env.MergeFlags([os.getenv(flags)])
+@@ -194,14 +194,12 @@ def installdir(dir):
+ 
+ # Honor the specified installation prefix in link paths.
+ env.Prepend(LIBPATH=[os.path.join(env['prefix'], installdir('libdir'))])
+-env.Prepend(RPATH=[os.path.join(env['prefix'], installdir('libdir'))])
+ 
+ # Tell generated binaries to look in the current directory for
+ # shared libraries. Should be handled sanely by scons on all systems.
+ # Not good to use '.' or a relative path here; it's a security risk.
+ # At install time we should use chrpath to edit this out of RPATH.
+ env.Prepend(LIBPATH=[os.path.realpath(os.curdir)])
+-env.Prepend(RPATH=[os.path.realpath(os.curdir)])
+ 
+ # Give deheader a way to set compiler flags
+ if 'MORECFLAGS' in os.environ:
+@@ -217,8 +215,7 @@ env.SourceCode('.', None)
+ 
+ # Should we build with debug symbols?
+ if env['debug']:
+-    env.Append(CCFLAGS=['-g'])
+-    env.Append(CCFLAGS=['-O0'])
++    pass
+ else:
+     env.Append(CCFLAGS=['-O2'])
+ 
+@@ -383,6 +380,7 @@ if config.CheckExecutable('$CHRPATH -v',
+     have_chrpath = True
+ else:
+     have_chrpath = False
++have_chrpath = False
+ 
+ # Map options to libraries required to support them that might be absent.
+ optionrequires = {
+@@ -822,7 +820,7 @@ if st != 0:
+     from datetime import datetime
+     rev = datetime.now().isoformat()[:-4]
+ revision='#define REVISION "%s"\n' %(rev.strip(),)
+-env.NoClean(env.Textfile(target="revision.h", source=[revision]))
++#env.NoClean(env.Textfile(target="revision.h", source=[revision]))
+ 
+ generated_sources = ['packet_names.h', 'timebase.h', 'gpsd.h', "ais_json.i",
+                      'gps_maskdump.c', 'ais_json.c', 'revision.h']

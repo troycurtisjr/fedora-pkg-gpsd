@@ -1,6 +1,6 @@
 Name: gpsd
-Version: 2.95
-Release: 7%{?dist}
+Version: 3.0
+Release: 1%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -9,16 +9,15 @@ URL: http://developer.berlios.de/projects/gpsd/
 Source0: http://download.berlios.de/gpsd/%{name}-%{version}.tar.gz
 Source10: gpsd.service
 Source11: gpsd.sysconfig
-Patch0: gpsd-2.95-silentmake.patch
-Patch1: gpsd-2.95-hotplugvars.patch
-Patch2: gpsd-2.95-gpscatnoarg.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+# fix RPATH, CFLAGS and revision.h
+Patch0:   gpsd-scons.patch
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
+BuildRequires: scons desktop-file-utils bluez-libs-devel
 %ifnarch s390 s390x
 BuildRequires: libusb1-devel
 %endif
-BuildRequires: desktop-file-utils
 
 Requires: %{name}-libs = %{version}-%{release}
 Requires: udev
@@ -73,24 +72,32 @@ can run on a serial terminal or terminal emulator.
 
 %prep
 %setup -q
-%patch0 -p1 -b .silentmake
-%patch1 -p1 -b .hotplugvars
-%patch2 -p1 -b .gpscatnoarg
+%patch0 -p1 -b .scons
+
+echo '#define REVISION "release-%{version}-%{release}"' > revision.h
 
 %build
-%configure \
-	--enable-dbus \
-	--disable-libQgpsmm \
-	--disable-static
-sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
-sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-
-make %{?_smp_mflags}
+export CFLAGS="%{optflags}"
+# fails with %{_smp_mflags}
+scons \
+	dbus=yes \
+	systemd=yes \
+	libQgpsmm=no \
+	debug=yes \
+	prefix="" \
+	sysconfdif=%{_sysconfdir} \
+	bindir=%{_bindir} \
+	includedir=%{_includedir} \
+	libdir=%{_libdir} \
+	sbindir=%{_sbindir} \
+	mandir=%{_mandir} \
+	docdir=%{_docdir} \
+	build
 
 
 %install
 rm -rf %{buildroot}
-make DESTDIR=%{buildroot} pythondir=%{python_sitearch} install
+DESTDIR=%{buildroot} scons install
 
 # service files
 %{__install} -d -m 0755 %{buildroot}/lib/systemd/system
@@ -108,13 +115,7 @@ make DESTDIR=%{buildroot} pythondir=%{python_sitearch} install
 
 # hotplug script
 %{__install} -d -m 0755 %{buildroot}/lib/udev
-%{__install} -p -m 0755 gpsd.hotplug gpsd.hotplug.wrapper %{buildroot}/lib/udev
-
-# remove .la files
-rm -f %{buildroot}%{_libdir}/libgps*.la
-
-# fix non-executable python script
-%{__chmod} +x %{buildroot}%{python_sitearch}/gps/gps.py
+%{__install} -p -m 0755 gpsd.hotplug %{buildroot}/lib/udev
 
 # Install the .desktop files
 desktop-file-install --vendor fedora \
@@ -130,6 +131,8 @@ desktop-file-install --vendor fedora \
 %{__install} -d -m 0755 %{buildroot}%{_datadir}/gpsd
 %{__install} -p -m 0644 packaging/X11/gpsd-logo.png %{buildroot}%{_datadir}/gpsd/gpsd-logo.png
 
+# Not needed since gpsd.h is not installed
+rm %{buildroot}%{_libdir}/{libgpsd.so,pkgconfig/libgpsd.pc}
 
 %clean
 rm -rf %{buildroot}
@@ -161,12 +164,14 @@ fi
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 %config(noreplace) %{_sysconfdir}/udev/rules.d/*
 %{_sbindir}/gpsd
+%{_sbindir}/gpsdctl
 %{_bindir}/gpsprof
 %{_bindir}/gpsmon
 %{_bindir}/gpsctl
 /lib/systemd/system/gpsd.service
 /lib/udev/gpsd*
 %{_mandir}/man8/gpsd.8*
+%{_mandir}/man8/gpsdctl.8*
 %{_mandir}/man1/gpsprof.1*
 %{_mandir}/man1/gpsmon.1*
 %{_mandir}/man1/gpsctl.1*
@@ -186,17 +191,18 @@ fi
 %{python_sitearch}/gps/fake*
 %{_includedir}/gps.h
 %{_includedir}/libgpsmm.h
-%{_includedir}/gpsd.h
 %{_mandir}/man1/gpsfake.1*
 %{_mandir}/man3/libgps.3*
+%{_mandir}/man3/libQgpsmm.3*
 %{_mandir}/man3/libgpsmm.3*
 %{_mandir}/man3/libgpsd.3*
-%{_mandir}/man5/rtcm-104.5*
+%{_mandir}/man5/gpsd_json.5*
 %{_mandir}/man5/srec.5*
 
 %files clients
 %defattr(-,root,root,-)
 %{_bindir}/cgps
+%{_bindir}/gegps
 %{_bindir}/gpscat
 %{_bindir}/gpsdecode
 %{_bindir}/gpspipe
@@ -204,6 +210,7 @@ fi
 %{_bindir}/lcdgps
 %{_bindir}/xgps
 %{_bindir}/xgpsspeed
+%{_mandir}/man1/gegps.1*
 %{_mandir}/man1/gps.1*
 %{_mandir}/man1/gpsdecode.1*
 %{_mandir}/man1/gpspipe.1*
