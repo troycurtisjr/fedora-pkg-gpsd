@@ -227,6 +227,16 @@ fi
 
 
 %changelog
+* Tue Aug 23 2011 Miroslav Lichvar <mlichvar@redhat.com> - 3.0-1
+- update to 3.0
+- enable PPSAPI support
+- fix PPS without -N
+- change service type to simple
+- start after chrony
+- fix permissions of systemd unit file
+- fix ldconfig scriptlets
+- package client-howto.txt
+
 * Tue Jul 26 2011 Miroslav Lichvar <mlichvar@redhat.com> - 2.95-7
 - make -libs subpackage (#663124)
 - replace SysV initscript with systemd service (#717419)
