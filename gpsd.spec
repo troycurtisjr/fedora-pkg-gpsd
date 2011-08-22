@@ -12,6 +12,7 @@ Source11: gpsd.sysconfig
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # fix RPATH, CFLAGS and revision.h
 Patch0:   gpsd-scons.patch
+Patch1:   gpsd-priv.patch
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
 BuildRequires: scons desktop-file-utils bluez-libs-devel pps-tools-devel
@@ -73,6 +74,7 @@ can run on a serial terminal or terminal emulator.
 %prep
 %setup -q
 %patch0 -p1 -b .scons
+%patch1 -p1 -b .priv
 
 echo '#define REVISION "release-%{version}-%{release}"' > revision.h
 
