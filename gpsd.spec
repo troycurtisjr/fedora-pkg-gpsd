@@ -14,7 +14,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Patch0:   gpsd-scons.patch
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
-BuildRequires: scons desktop-file-utils bluez-libs-devel
+BuildRequires: scons desktop-file-utils bluez-libs-devel pps-tools-devel
 %ifnarch s390 s390x
 BuildRequires: libusb1-devel
 %endif
