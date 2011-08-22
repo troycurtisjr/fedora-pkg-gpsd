@@ -1,5 +1,3 @@
-%{!?python_sitearch: %global python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
-
 Name: gpsd
 Version: 2.95
 Release: 7%{?dist}
