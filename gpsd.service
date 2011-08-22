@@ -3,10 +3,11 @@ Description=GPS Service Daemon
 After=syslog.target network.target
 
 [Service]
-Type=forking
+Type=simple
 PIDFile=/var/run/gpsd.pid
 EnvironmentFile=-/etc/sysconfig/gpsd
-ExecStart=/usr/sbin/gpsd -P /var/run/gpsd.pid -F /var/run/gpsd.sock $OPTIONS $DEVICE
+ExecStart=/usr/sbin/gpsd -P /var/run/gpsd.pid -F /var/run/gpsd.sock -N $OPTIONS $DEVICE
+StandardError=syslog
 
 [Install]
 WantedBy=multi-user.target
