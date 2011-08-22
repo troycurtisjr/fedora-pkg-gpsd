@@ -186,7 +186,7 @@ fi
 
 %files devel
 %defattr(-,root,root,-)
-%doc TODO
+%doc TODO www/client-howto.txt
 %{_bindir}/gpsfake
 %{_libdir}/libgps*.so
 %{_libdir}/pkgconfig/*.pc
