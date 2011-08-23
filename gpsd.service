@@ -1,6 +1,6 @@
 [Unit]
 Description=GPS Service Daemon
-After=syslog.target network.target
+After=syslog.target network.target chronyd.service
 
 [Service]
 Type=simple
