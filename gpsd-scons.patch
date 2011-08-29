@@ -1,16 +1,7 @@
-diff -up gpsd-3.0/SConstruct.scons gpsd-3.0/SConstruct
---- gpsd-3.0/SConstruct.scons	2011-08-19 07:36:28.000000000 +0200
-+++ gpsd-3.0/SConstruct	2011-08-22 16:35:20.763702823 +0200
-@@ -155,7 +155,7 @@ for i in ["AR", "ARFLAGS", "CCFLAGS", "C
-         j = i
-         if i == "LD":
-             i = "SHLINK"
--        env[j]=os.getenv(i)
-+        env[j]=Split(os.getenv(i))
- for flags in ["LDFLAGS", "CPPFLAGS"]:
-     if os.environ.has_key(flags):
-         env.MergeFlags([os.getenv(flags)])
-@@ -194,14 +194,12 @@ def installdir(dir):
+diff -up gpsd-3.1/SConstruct.scons gpsd-3.1/SConstruct
+--- gpsd-3.1/SConstruct.scons	2011-08-28 13:14:24.000000000 +0200
++++ gpsd-3.1/SConstruct	2011-08-29 16:18:11.701614604 +0200
+@@ -208,14 +208,12 @@ def installdir(dir):
  
  # Honor the specified installation prefix in link paths.
  env.Prepend(LIBPATH=[os.path.join(env['prefix'], installdir('libdir'))])
@@ -25,17 +16,7 @@ diff -up gpsd-3.0/SConstruct.scons gpsd-3.0/SConstruct
  
  # Give deheader a way to set compiler flags
  if 'MORECFLAGS' in os.environ:
-@@ -217,8 +215,7 @@ env.SourceCode('.', None)
- 
- # Should we build with debug symbols?
- if env['debug']:
--    env.Append(CCFLAGS=['-g'])
--    env.Append(CCFLAGS=['-O0'])
-+    pass
- else:
-     env.Append(CCFLAGS=['-O2'])
- 
-@@ -383,6 +380,7 @@ if config.CheckExecutable('$CHRPATH -v',
+@@ -409,6 +407,7 @@ if config.CheckExecutable('$CHRPATH -v',
      have_chrpath = True
  else:
      have_chrpath = False
@@ -43,7 +24,7 @@ diff -up gpsd-3.0/SConstruct.scons gpsd-3.0/SConstruct
  
  # Map options to libraries required to support them that might be absent.
  optionrequires = {
-@@ -822,7 +820,7 @@ if st != 0:
+@@ -896,7 +895,7 @@ if st != 0:
      from datetime import datetime
      rev = datetime.now().isoformat()[:-4]
  revision='#define REVISION "%s"\n' %(rev.strip(),)

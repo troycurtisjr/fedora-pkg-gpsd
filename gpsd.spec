@@ -1,5 +1,5 @@
 Name: gpsd
-Version: 3.0
+Version: 3.1
 Release: 1%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
@@ -12,7 +12,6 @@ Source11: gpsd.sysconfig
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # fix RPATH, CFLAGS and revision.h
 Patch0:   gpsd-scons.patch
-Patch1:   gpsd-priv.patch
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
 BuildRequires: scons desktop-file-utils bluez-libs-devel pps-tools-devel
@@ -74,14 +73,12 @@ can run on a serial terminal or terminal emulator.
 %prep
 %setup -q
 %patch0 -p1 -b .scons
-%patch1 -p1 -b .priv
 
 echo '#define REVISION "release-%{version}-%{release}"' > revision.h
 
 %build
-export CFLAGS="%{optflags}"
-# fails with %{_smp_mflags}
-scons \
+export CCFLAGS="%{optflags}"
+scons %{_smp_mflags} \
 	dbus=yes \
 	systemd=yes \
 	libQgpsmm=no \
@@ -94,11 +91,14 @@ scons \
 	sbindir=%{_sbindir} \
 	mandir=%{_mandir} \
 	docdir=%{_docdir} \
+	pkgconfigdir=%{_libdir}/pkgconfig \
 	build
 
 
 %install
 rm -rf %{buildroot}
+# avoid rebuilding
+export CCFLAGS="%{optflags}"
 DESTDIR=%{buildroot} scons install
 
 # service files
@@ -227,6 +227,9 @@ fi
 
 
 %changelog
+* Mon Aug 29 2011 Miroslav Lichvar <mlichvar@redhat.com> - 3.1-1
+- update to 3.1
+
 * Tue Aug 23 2011 Miroslav Lichvar <mlichvar@redhat.com> - 3.0-1
 - update to 3.0
 - enable PPSAPI support
