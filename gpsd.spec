@@ -10,7 +10,7 @@ Source0: http://download.berlios.de/gpsd/%{name}-%{version}.tar.gz
 Source10: gpsd.service
 Source11: gpsd.sysconfig
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-# fix RPATH, CFLAGS and revision.h
+# fix RPATH, libs and revision.h
 Patch0:   gpsd-scons.patch
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
