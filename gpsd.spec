@@ -78,7 +78,8 @@ echo '#define REVISION "release-%{version}-%{release}"' > revision.h
 
 %build
 export CCFLAGS="%{optflags}"
-scons %{_smp_mflags} \
+# breaks with %{_smp_mflags}
+scons \
 	dbus=yes \
 	systemd=yes \
 	libQgpsmm=no \
