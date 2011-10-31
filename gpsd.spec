@@ -1,16 +1,16 @@
 Name: gpsd
-Version: 3.1
+Version: 3.3
 Release: 1%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
 License: BSD
-URL: http://developer.berlios.de/projects/gpsd/
-Source0: http://download.berlios.de/gpsd/%{name}-%{version}.tar.gz
+URL: http://catb.org/gpsd/
+Source0: http://download.savannah.gnu.org/releases/gpsd/%{name}-%{version}.tar.gz
 Source10: gpsd.service
 Source11: gpsd.sysconfig
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-# fix RPATH, libs and revision.h
+# fix RPATH and revision.h
 Patch0:   gpsd-scons.patch
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
@@ -187,7 +187,7 @@ fi
 
 %files devel
 %defattr(-,root,root,-)
-%doc TODO www/client-howto.txt
+%doc TODO
 %{_bindir}/gpsfake
 %{_libdir}/libgps*.so
 %{_libdir}/pkgconfig/*.pc
@@ -228,6 +228,9 @@ fi
 
 
 %changelog
+* Mon Oct 31 2011 Miroslav Lichvar <mlichvar@redhat.com> - 3.3-1
+- update to 3.3
+
 * Mon Aug 29 2011 Miroslav Lichvar <mlichvar@redhat.com> - 3.1-1
 - update to 3.1
 
