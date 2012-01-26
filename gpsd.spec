@@ -1,6 +1,6 @@
 Name: gpsd
-Version: 3.3
-Release: 2%{?dist}
+Version: 3.4
+Release: 1%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -10,11 +10,10 @@ Source0: http://download.savannah.gnu.org/releases/gpsd/%{name}-%{version}.tar.g
 Source10: gpsd.service
 Source11: gpsd.sysconfig
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-# fix RPATH and revision.h
-Patch0:   gpsd-scons.patch
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
 BuildRequires: scons desktop-file-utils bluez-libs-devel pps-tools-devel
+BuildRequires: chrpath
 %ifnarch s390 s390x
 BuildRequires: libusb1-devel
 %endif
@@ -72,9 +71,6 @@ can run on a serial terminal or terminal emulator.
 
 %prep
 %setup -q
-%patch0 -p1 -b .scons
-
-echo '#define REVISION "release-%{version}-%{release}"' > revision.h
 
 %build
 export CCFLAGS="%{optflags}"
@@ -136,6 +132,12 @@ desktop-file-install --vendor fedora \
 
 # Not needed since gpsd.h is not installed
 rm %{buildroot}%{_libdir}/{libgpsd.so,pkgconfig/libgpsd.pc}
+
+# Remove RPATH (even the actual string)
+for i in %{buildroot}%{python_sitearch}/gps/*.so; do
+	chrpath -r "" $i
+	chrpath -d $i
+done
 
 %clean
 rm -rf %{buildroot}
@@ -228,6 +230,9 @@ fi
 
 
 %changelog
+* Thu Jan 26 2012 Miroslav Lichvar <mlichvar@redhat.com> - 3.4-1
+- update to 3.4
+
 * Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
