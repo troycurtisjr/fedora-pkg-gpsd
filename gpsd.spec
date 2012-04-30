@@ -1,5 +1,5 @@
 Name: gpsd
-Version: 3.4
+Version: 3.5
 Release: 1%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
@@ -9,6 +9,7 @@ URL: http://catb.org/gpsd/
 Source0: http://download.savannah.gnu.org/releases/gpsd/%{name}-%{version}.tar.gz
 Source10: gpsd.service
 Source11: gpsd.sysconfig
+Patch1: gpsd-nolibcap.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
@@ -71,6 +72,7 @@ can run on a serial terminal or terminal emulator.
 
 %prep
 %setup -q
+%patch1 -p1 -b .nolibcap
 
 %build
 export CCFLAGS="%{optflags}"
@@ -230,6 +232,9 @@ fi
 
 
 %changelog
+* Mon Apr 30 2012 Miroslav Lichvar <mlichvar@redhat.com> - 3.5-1
+- update to 3.5
+
 * Thu Jan 26 2012 Miroslav Lichvar <mlichvar@redhat.com> - 3.4-1
 - update to 3.4
 
