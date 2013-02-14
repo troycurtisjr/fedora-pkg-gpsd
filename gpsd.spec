@@ -1,6 +1,6 @@
 Name: gpsd
 Version: 3.5
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -232,6 +232,9 @@ fi
 
 
 %changelog
+* Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.5-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
 * Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.5-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
