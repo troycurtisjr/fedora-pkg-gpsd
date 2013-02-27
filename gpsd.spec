@@ -22,6 +22,7 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Requires: udev
 Requires(post): systemd-units
 Requires(preun): systemd-units
+Requires(postun): systemd-units
 
 %description 
 gpsd is a service daemon that mediates access to a GPS sensor
@@ -141,24 +142,18 @@ for i in %{buildroot}%{python_sitearch}/gps/*.so; do
 done
 
 %post
-/bin/systemctl daemon-reload &> /dev/null
-if [ -f %{_initrddir}/%{name} ] && /sbin/chkconfig --level 3 %{name}; then
-        /bin/systemctl enable %{name}.service &> /dev/null
-fi
-:
+%systemd_post gpsd.service
 
 %preun
-if [ $1 = 0 ]; then
-	/bin/systemctl --no-reload disable %{name}.service &> /dev/null
-	/bin/systemctl stop %{name}.service &> /dev/null
-fi
-:
+%systemd_preun gpsd.service
+
+%postun
+# Don't restart the service
+%systemd_postun
 
 %post libs -p /sbin/ldconfig
 
-
 %postun libs -p /sbin/ldconfig
-
 
 %files
 %doc README INSTALL COPYING
