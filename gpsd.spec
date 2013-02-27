@@ -1,6 +1,6 @@
 Name: gpsd
-Version: 3.5
-Release: 3%{?dist}
+Version: 3.8
+Release: 1%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -132,6 +132,9 @@ desktop-file-install --vendor fedora \
 %{__install} -d -m 0755 %{buildroot}%{_datadir}/gpsd
 %{__install} -p -m 0644 packaging/X11/gpsd-logo.png %{buildroot}%{_datadir}/gpsd/gpsd-logo.png
 
+# Missed in scons install 
+%{__install} -p -m 0755 gpsinit %{buildroot}%{_sbindir}
+
 # Not needed since gpsd.h is not installed
 rm %{buildroot}%{_libdir}/{libgpsd.so,pkgconfig/libgpsd.pc}
 
@@ -172,6 +175,7 @@ fi
 %config(noreplace) %{_sysconfdir}/udev/rules.d/*
 %{_sbindir}/gpsd
 %{_sbindir}/gpsdctl
+%{_sbindir}/gpsinit
 %{_bindir}/gpsprof
 %{_bindir}/gpsmon
 %{_bindir}/gpsctl
@@ -179,6 +183,7 @@ fi
 /lib/udev/gpsd*
 %{_mandir}/man8/gpsd.8*
 %{_mandir}/man8/gpsdctl.8*
+%{_mandir}/man8/gpsinit.8*
 %{_mandir}/man1/gpsprof.1*
 %{_mandir}/man1/gpsmon.1*
 %{_mandir}/man1/gpsctl.1*

@@ -1,7 +1,7 @@
-diff -up gpsd-3.5/SConstruct.libcap gpsd-3.5/SConstruct
---- gpsd-3.5/SConstruct.libcap	2012-04-14 15:36:18.000000000 +0200
-+++ gpsd-3.5/SConstruct	2012-04-30 10:39:45.370120340 +0200
-@@ -458,7 +458,7 @@ else:
+diff -up gpsd-3.8/SConstruct.nolibcap gpsd-3.8/SConstruct
+--- gpsd-3.8/SConstruct.nolibcap	2013-02-26 05:09:38.000000000 +0100
++++ gpsd-3.8/SConstruct	2013-02-27 11:09:11.561350794 +0100
+@@ -490,7 +490,7 @@ else:
      confdefs.append("/* #undef HAVE_LIBRT */\n")
      rtlibs = []
  
@@ -9,4 +9,4 @@ diff -up gpsd-3.5/SConstruct.libcap gpsd-3.5/SConstruct
 +if False and config.CheckLib('libcap'):
      confdefs.append("#define HAVE_LIBCAP 1\n")
      # System library - no special flags
-     rtlibs = ["-lcap"]
+     caplibs = ["-lcap"]
