@@ -220,6 +220,13 @@ done
 
 
 %changelog
+* Wed Feb 27 2013 Miroslav Lichvar <mlichvar@redhat.com> - 3.8-1
+- update to 3.8
+- use systemd macros (#850135)
+- don't set vendor for desktop files
+- make some dependencies arch-specific
+- remove obsolete macros
+
 * Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.5-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
