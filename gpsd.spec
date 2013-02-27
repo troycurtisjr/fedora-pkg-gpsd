@@ -10,7 +10,6 @@ Source0: http://download.savannah.gnu.org/releases/gpsd/%{name}-%{version}.tar.g
 Source10: gpsd.service
 Source11: gpsd.sysconfig
 Patch1: gpsd-nolibcap.patch
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
 BuildRequires: scons desktop-file-utils bluez-libs-devel pps-tools-devel
@@ -95,7 +94,6 @@ scons \
 
 
 %install
-rm -rf %{buildroot}
 # avoid rebuilding
 export CCFLAGS="%{optflags}"
 DESTDIR=%{buildroot} scons install
@@ -144,10 +142,6 @@ for i in %{buildroot}%{python_sitearch}/gps/*.so; do
 	chrpath -d $i
 done
 
-%clean
-rm -rf %{buildroot}
-
-
 %post
 /bin/systemctl daemon-reload &> /dev/null
 if [ -f %{_initrddir}/%{name} ] && /sbin/chkconfig --level 3 %{name}; then
@@ -169,7 +163,6 @@ fi
 
 
 %files
-%defattr(-,root,root,-)
 %doc README INSTALL COPYING
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 %config(noreplace) %{_sysconfdir}/udev/rules.d/*
@@ -189,13 +182,11 @@ fi
 %{_mandir}/man1/gpsctl.1*
 
 %files libs
-%defattr(-,root,root,-)
 %{_libdir}/libgps*.so.*
 %{python_sitearch}/gps*
 %exclude %{python_sitearch}/gps/fake*
 
 %files devel
-%defattr(-,root,root,-)
 %doc TODO
 %{_bindir}/gpsfake
 %{_libdir}/libgps*.so
@@ -212,7 +203,6 @@ fi
 %{_mandir}/man5/srec.5*
 
 %files clients
-%defattr(-,root,root,-)
 %{_bindir}/cgps
 %{_bindir}/gegps
 %{_bindir}/gpscat
