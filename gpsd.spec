@@ -117,13 +117,11 @@ DESTDIR=%{buildroot} scons install
 %{__install} -p -m 0755 gpsd.hotplug %{buildroot}/lib/udev
 
 # Install the .desktop files
-desktop-file-install --vendor fedora \
+desktop-file-install \
 	--dir %{buildroot}%{_datadir}/applications \
-	--add-category X-Fedora \
 	packaging/X11/xgps.desktop
-desktop-file-install --vendor fedora \
+desktop-file-install \
 	--dir %{buildroot}%{_datadir}/applications \
-	--add-category X-Fedora \
 	packaging/X11/xgpsspeed.desktop
 
 # Install logo icon for .desktop files
