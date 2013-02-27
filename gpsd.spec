@@ -18,7 +18,7 @@ BuildRequires: chrpath
 BuildRequires: libusb1-devel
 %endif
 
-Requires: %{name}-libs = %{version}-%{release}
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Requires: udev
 Requires(post): systemd-units
 Requires(preun): systemd-units
@@ -44,7 +44,7 @@ to a GPS for applications.
 %package devel
 Summary: Development files for the gpsd library
 Group: Development/Libraries
-Requires: %{name}-libs = %{version}-%{release}
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Requires: pkgconfig
 
 %description devel
