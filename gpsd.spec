@@ -1,5 +1,5 @@
 Name: gpsd
-Version: 3.8
+Version: 3.9
 Release: 1%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
