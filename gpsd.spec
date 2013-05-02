@@ -100,9 +100,9 @@ export CCFLAGS="%{optflags}"
 DESTDIR=%{buildroot} scons install
 
 # service files
-%{__install} -d -m 0755 %{buildroot}/lib/systemd/system
+%{__install} -d -m 0755 %{buildroot}%{_unitdir}
 %{__install} -p -m 0644 %{SOURCE10} \
-	%{buildroot}/lib/systemd/system/gpsd.service
+	%{buildroot}%{_unitdir}/gpsd.service
 
 %{__install} -d -m 0755 %{buildroot}%{_sysconfdir}/sysconfig
 %{__install} -p -m 0644 %{SOURCE11} \
@@ -114,8 +114,8 @@ DESTDIR=%{buildroot} scons install
 	%{buildroot}%{_sysconfdir}/udev/rules.d/99-gpsd.rules
 
 # hotplug script
-%{__install} -d -m 0755 %{buildroot}/lib/udev
-%{__install} -p -m 0755 gpsd.hotplug %{buildroot}/lib/udev
+%{__install} -d -m 0755 %{buildroot}%{_prefix}/lib/udev
+%{__install} -p -m 0755 gpsd.hotplug %{buildroot}%{_prefix}/lib/udev
 
 # Install the .desktop files
 desktop-file-install \
@@ -165,8 +165,8 @@ done
 %{_bindir}/gpsprof
 %{_bindir}/gpsmon
 %{_bindir}/gpsctl
-/lib/systemd/system/gpsd.service
-/lib/udev/gpsd*
+%{_unitdir}/gpsd.service
+%{_prefix}/lib/udev/gpsd*
 %{_mandir}/man8/gpsd.8*
 %{_mandir}/man8/gpsdctl.8*
 %{_mandir}/man8/gpsinit.8*
