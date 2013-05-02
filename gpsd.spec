@@ -220,6 +220,10 @@ done
 
 
 %changelog
+* Thu May 02 2013 Miroslav Lichvar <mlichvar@redhat.com> - 3.9-1
+- update to 3.9
+- move files from /lib
+
 * Wed Feb 27 2013 Miroslav Lichvar <mlichvar@redhat.com> - 3.8-1
 - update to 3.8
 - use systemd macros (#850135)
