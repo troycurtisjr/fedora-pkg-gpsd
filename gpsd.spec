@@ -158,7 +158,7 @@ done
 %postun libs -p /sbin/ldconfig
 
 %files
-%doc README INSTALL COPYING
+%doc README COPYING
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 %config(noreplace) %{_sysconfdir}/udev/rules.d/*
 %{_sbindir}/gpsd
