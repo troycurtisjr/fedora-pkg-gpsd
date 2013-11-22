@@ -1,5 +1,5 @@
 Name: gpsd
-Version: 3.9
+Version: 3.10
 Release: 2%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
@@ -9,6 +9,7 @@ URL: http://catb.org/gpsd/
 Source0: http://download.savannah.gnu.org/releases/gpsd/%{name}-%{version}.tar.gz
 Source10: gpsd.service
 Source11: gpsd.sysconfig
+# PPS seems to be working without cap_sys_time
 Patch1: gpsd-nolibcap.patch
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
@@ -82,6 +83,7 @@ scons \
 	systemd=yes \
 	libQgpsmm=no \
 	debug=yes \
+	leapfetch=no \
 	prefix="" \
 	sysconfdif=%{_sysconfdir} \
 	bindir=%{_bindir} \
@@ -198,6 +200,7 @@ done
 %files clients
 %{_bindir}/cgps
 %{_bindir}/gegps
+%{_bindir}/gps2udp
 %{_bindir}/gpscat
 %{_bindir}/gpsdecode
 %{_bindir}/gpspipe
@@ -207,6 +210,7 @@ done
 %{_bindir}/xgpsspeed
 %{_mandir}/man1/gegps.1*
 %{_mandir}/man1/gps.1*
+%{_mandir}/man1/gps2udp.1*
 %{_mandir}/man1/gpsdecode.1*
 %{_mandir}/man1/gpspipe.1*
 %{_mandir}/man1/lcdgps.1*

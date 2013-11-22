@@ -1,12 +1,99 @@
-diff -up gpsd-3.8/SConstruct.nolibcap gpsd-3.8/SConstruct
---- gpsd-3.8/SConstruct.nolibcap	2013-02-26 05:09:38.000000000 +0100
-+++ gpsd-3.8/SConstruct	2013-02-27 11:09:11.561350794 +0100
-@@ -490,7 +490,7 @@ else:
-     confdefs.append("/* #undef HAVE_LIBRT */\n")
+commit a128248dbcab3d15da72bdc77c53cbde8de0baa1
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Fri Nov 22 18:19:43 2013 +0100
+
+    Don't keep cap_sys_time capability.
+    
+    It's not necessary to keep the capability since time_pps_setparams is
+    called before root privileges are dropped.
+    
+    Signed-off-by: Eric S. Raymond <esr@thyrsus.com>
+
+diff --git a/SConstruct b/SConstruct
+index 4332fe4..c5120ae 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -455,7 +455,6 @@ if env.GetOption("clean") or env.GetOption("help"):
      rtlibs = []
+     usblibs = []
+     bluezlibs = []
+-    caplibs = []
+     ncurseslibs = []
+     confdefs = []
+     manbuilder = False
+@@ -558,14 +557,6 @@ else:
+         confdefs.append("/* #undef HAVE_LIBRT */\n")
+         rtlibs = []
  
--if config.CheckLib('libcap'):
-+if False and config.CheckLib('libcap'):
-     confdefs.append("#define HAVE_LIBCAP 1\n")
-     # System library - no special flags
-     caplibs = ["-lcap"]
+-    if config.CheckLib('libcap'):
+-        confdefs.append("#define HAVE_LIBCAP 1\n")
+-        # System library - no special flags
+-        caplibs = ["-lcap"]
+-    else:
+-        confdefs.append("/* #undef HAVE_LIBCAP */\n")
+-        caplibs = []
+-
+     if env['dbus_export'] and config.CheckPKG('dbus-1'):
+         confdefs.append("#define HAVE_DBUS 1\n")
+         dbus_libs = pkg_config('dbus-1')
+@@ -957,7 +948,7 @@ if qt_env:
+ # The libraries have dependencies on system libraries
+ 
+ gpslibs = ["-lgps", "-lm"]
+-gpsdlibs = ["-lgpsd"] + usblibs + bluezlibs + gpslibs + caplibs
++gpsdlibs = ["-lgpsd"] + usblibs + bluezlibs + gpslibs
+ 
+ 
+ # We need to be able to make a static client library for ad-hoc testing.
+diff --git a/gpsd.c b/gpsd.c
+index 76d1850..d7fce5f 100644
+--- a/gpsd.c
++++ b/gpsd.c
+@@ -44,11 +44,6 @@
+ 
+ #include "gpsd_config.h"
+ 
+-#if defined(HAVE_LIBCAP) && !defined(S_SPLINT_S)
+-#include <sys/capability.h>
+-#include <sys/prctl.h>
+-#endif /* HAVE_LIBCAP */
+-
+ #include "gpsd.h"
+ #include "sockaddr.h"
+ #include "gps_json.h"
+@@ -2039,13 +2034,6 @@ int main(int argc, char *argv[])
+ 	struct passwd *pw;
+ 	struct stat stb;
+ 
+-#if defined(HAVE_LIBCAP) && !defined(S_SPLINT_S)
+- 	/* set flag: keep privileges across setuid() call */
+-	if (prctl(PR_SET_KEEPCAPS, 1L, 0L, 0L, 0L) == -1)
+-	    gpsd_report(context.debug, LOG_ERR,
+-			"prctl(PR_SET_KEEPCAPS, 1L ) failed\n");
+-#endif /* HAVE_LIBCAP */
+-
+ 	/* make default devices accessible even after we drop privileges */
+ 	for (i = optind; i < argc; i++)
+ 	    /* coverity[toctou] */
+@@ -2091,21 +2079,6 @@ int main(int argc, char *argv[])
+ 			    "setuid() failed, errno %s\n",
+ 			    strerror(errno));
+ 	/*@+type@*/
+-
+- #if defined(HAVE_LIBCAP) && !defined(S_SPLINT_S)
+-	/* drop root capabilities, except CAP_SYS_TIME for 1PPS support */
+-	{
+-	    cap_t caps = cap_from_text("cap_sys_time=pe");
+-
+-	    if (!caps)
+-		gpsd_report(context.debug, LOG_ERR, "cap_from_text() failed.\n");
+-	    else if (cap_set_proc(caps) == -1) {
+-		gpsd_report(context.debug, LOG_ERR,
+-			    "cap_set_proc() failed to drop root privs\n");
+-		cap_free(caps);
+-	    }
+-	}
+-#endif /* HAVE_LIBCAP */
+     }
+     gpsd_report(context.debug, LOG_INF,
+ 		"running with effective group ID %d\n", getegid());
