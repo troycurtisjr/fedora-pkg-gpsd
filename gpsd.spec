@@ -1,3 +1,5 @@
+%global _hardened_build 1
+
 Name: gpsd
 Version: 3.10
 Release: 2%{?dist}
@@ -11,6 +13,8 @@ Source10: gpsd.service
 Source11: gpsd.sysconfig
 # PPS seems to be working without cap_sys_time
 Patch1: gpsd-nolibcap.patch
+# allow multiple options in LINKFLAGS
+Patch2: gpsd-linkflags.patch
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
 BuildRequires: scons desktop-file-utils bluez-libs-devel pps-tools-devel
@@ -74,9 +78,11 @@ can run on a serial terminal or terminal emulator.
 %prep
 %setup -q
 %patch1 -p1 -b .nolibcap
+%patch2 -p1 -b .linkflags
 
 %build
 export CCFLAGS="%{optflags}"
+export LINKFLAGS="%{__global_ldflags}"
 # breaks with %{_smp_mflags}
 scons \
 	dbus=yes \
@@ -99,6 +105,7 @@ scons \
 %install
 # avoid rebuilding
 export CCFLAGS="%{optflags}"
+export LINKFLAGS="%{__global_ldflags}"
 DESTDIR=%{buildroot} scons install
 
 # service files

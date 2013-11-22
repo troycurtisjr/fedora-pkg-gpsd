@@ -1,0 +1,30 @@
+commit 0583730e98906f9c779f8705138adb2572d305c2
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Fri Nov 22 18:19:40 2013 +0100
+
+    Allow multiple options in LINKFLAGS.
+    
+    Signed-off-by: Eric S. Raymond <esr@thyrsus.com>
+
+diff --git a/SConstruct b/SConstruct
+index b7627e7..4332fe4 100644
+--- a/SConstruct
++++ b/SConstruct
+@@ -239,7 +239,7 @@ env['PYTHON'] = sys.executable
+ env['STRIP'] = "strip"
+ env['PKG_CONFIG'] = "pkg-config"
+ env['CHRPATH'] = 'chrpath'
+-for i in ["AR", "ARFLAGS", "CCFLAGS", "CFLAGS", "CC", "CXX", "CXXFLAGS", "STRIP", "PKG_CONFIG", "CHRPATH", "LD", "TAR"]:
++for i in ["AR", "ARFLAGS", "CCFLAGS", "CFLAGS", "CC", "CXX", "CXXFLAGS", "LINKFLAGS", "STRIP", "PKG_CONFIG", "CHRPATH", "LD", "TAR"]:
+     if os.environ.has_key(i):
+         j = i
+         if i == "LD":
+@@ -248,7 +248,7 @@ for i in ["AR", "ARFLAGS", "CCFLAGS", "CFLAGS", "CC", "CXX", "CXXFLAGS", "STRIP"
+             env.Replace(**{j: Split(os.getenv(i))})
+         else:
+             env.Replace(**{j: os.getenv(i)})
+-for flag in ["LDFLAGS", "LINKFLAGS", "SHLINKFLAGS", "CPPFLAGS"]:
++for flag in ["LDFLAGS", "SHLINKFLAGS", "CPPFLAGS"]:
+     if os.environ.has_key(flag):
+         env.MergeFlags({flag : [os.getenv(flag)]})
+ 
