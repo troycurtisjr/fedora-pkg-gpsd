@@ -138,7 +138,13 @@ desktop-file-install \
 rm %{buildroot}%{_libdir}/{libgpsd.so,pkgconfig/libgpsd.pc}
 
 # Remove RPATH (even the actual string)
-for i in %{buildroot}%{python_sitearch}/gps/*.so; do
+for i in \
+	%{buildroot}%{_bindir}/gps{mon,ctl,2udp,decode,pipe} \
+	%{buildroot}%{_bindir}/{lcdgps,cgps,gpxlogger} \
+	%{buildroot}%{_sbindir}/gpsd{,ctl} \
+	%{buildroot}%{_libdir}/libgps{,d}.so.*.*.* \
+	%{buildroot}%{python_sitearch}/gps/*.so
+do
 	chrpath -r "" $i
 	chrpath -d $i
 done
