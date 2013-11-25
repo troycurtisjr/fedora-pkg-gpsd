@@ -124,9 +124,9 @@ DESTDIR=%{buildroot} scons install
 	%{buildroot}%{_sysconfdir}/sysconfig/gpsd
 
 # udev rules
-%{__install} -d -m 0755 %{buildroot}%{_sysconfdir}/udev/rules.d
+%{__install} -d -m 0755 %{buildroot}%{_udevrulesdir}
 %{__install} -p -m 0644 gpsd.rules \
-	%{buildroot}%{_sysconfdir}/udev/rules.d/99-gpsd.rules
+	%{buildroot}%{_udevrulesdir}/99-gpsd.rules
 
 # hotplug script
 %{__install} -d -m 0755 %{buildroot}%{_prefix}/lib/udev
@@ -179,7 +179,6 @@ done
 %files
 %doc README COPYING
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
-%config(noreplace) %{_sysconfdir}/udev/rules.d/*
 %{_sbindir}/gpsd
 %{_sbindir}/gpsdctl
 %{_sbindir}/gpsinit
@@ -187,6 +186,7 @@ done
 %{_bindir}/gpsmon
 %{_bindir}/gpsctl
 %{_unitdir}/gpsd.service
+%{_udevrulesdir}/*.rules
 %{_prefix}/lib/udev/gpsd*
 %{_mandir}/man8/gpsd.8*
 %{_mandir}/man8/gpsdctl.8*
