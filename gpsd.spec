@@ -17,6 +17,8 @@ Patch1: gpsd-nolibcap.patch
 Patch2: gpsd-linkflags.patch
 # set time stamp in chrony SOCK sample correctly
 Patch3: gpsd-chronyts.patch
+# drop also supplementary groups when dropping privileges
+Patch4: gpsd-setgroups.patch
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
 BuildRequires: scons desktop-file-utils bluez-libs-devel pps-tools-devel
@@ -82,6 +84,7 @@ can run on a serial terminal or terminal emulator.
 %patch1 -p1 -b .nolibcap
 %patch2 -p1 -b .linkflags
 %patch3 -p1 -b .chronyts
+%patch4 -p1 -b .setgroups
 
 %build
 export CCFLAGS="%{optflags}"

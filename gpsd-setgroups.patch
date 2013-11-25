@@ -1,0 +1,23 @@
+commit c3f7db262c8e2e615dae9c3db6f0385bddc48df2
+Author: Miroslav Lichvar <mlichvar@redhat.com>
+Date:   Fri Nov 22 18:19:41 2013 +0100
+
+    Drop also supplementary groups when dropping privileges.
+    
+    Signed-off-by: Eric S. Raymond <esr@thyrsus.com>
+
+diff --git a/gpsd.c b/gpsd.c
+index c77f684..76d1850 100644
+--- a/gpsd.c
++++ b/gpsd.c
+@@ -2059,6 +2059,10 @@ int main(int argc, char *argv[])
+ 	 * of any compromises in the code.  It requires that all GPS
+ 	 * devices have their group read/write permissions set.
+ 	 */
++	if (setgroups(0, NULL) != 0)
++	    gpsd_report(context.debug, LOG_ERROR,
++			"setgroups() failed, errno %s\n",
++			strerror(errno));
+ 	/*@-type@*/
+ #ifdef GPSD_GROUP
+ 	{
