@@ -15,6 +15,8 @@ Source11: gpsd.sysconfig
 Patch1: gpsd-nolibcap.patch
 # allow multiple options in LINKFLAGS
 Patch2: gpsd-linkflags.patch
+# set time stamp in chrony SOCK sample correctly
+Patch3: gpsd-chronyts.patch
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
 BuildRequires: scons desktop-file-utils bluez-libs-devel pps-tools-devel
@@ -79,6 +81,7 @@ can run on a serial terminal or terminal emulator.
 %setup -q
 %patch1 -p1 -b .nolibcap
 %patch2 -p1 -b .linkflags
+%patch3 -p1 -b .chronyts
 
 %build
 export CCFLAGS="%{optflags}"
