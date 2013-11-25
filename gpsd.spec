@@ -2,7 +2,7 @@
 
 Name: gpsd
 Version: 3.10
-Release: 2%{?dist}
+Release: 1%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -243,6 +243,15 @@ done
 
 
 %changelog
+* Mon Nov 25 2013 Miroslav Lichvar <mlichvar@redhat.com> - 3.10-1
+- update to 3.10
+- move udev rules from /etc to /usr/lib (#971851)
+- enable hardened build (#1000643)
+- drop also supplementary groups when dropping privileges
+- set time stamp in chrony SOCK sample correctly
+- remove RPATH from all files
+- don't package INSTALL file
+
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.9-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
