@@ -5,7 +5,8 @@ After=chronyd.service
 
 [Service]
 EnvironmentFile=-/etc/sysconfig/gpsd
-ExecStart=/usr/sbin/gpsd -F /var/run/gpsd.sock -N $OPTIONS $DEVICE
+ExecStart=/usr/sbin/gpsd -N $OPTIONS
 
 [Install]
 WantedBy=multi-user.target
+Also=gpsd.socket

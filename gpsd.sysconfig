@@ -1,3 +1,4 @@
+# Options for gpsd, including serial devices
 OPTIONS=""
-DEVICE="/dev/ttyUSB0"
+# Set to 'true' to add USB devices automatically via udev
 USBAUTO="true"

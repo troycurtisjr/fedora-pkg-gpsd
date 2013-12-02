@@ -118,6 +118,8 @@ DESTDIR=%{buildroot} scons install
 %{__install} -d -m 0755 %{buildroot}%{_unitdir}
 %{__install} -p -m 0644 %{SOURCE10} \
 	%{buildroot}%{_unitdir}/gpsd.service
+%{__install} -p -m 0644 systemd/gpsd.socket \
+	%{buildroot}%{_unitdir}/gpsd.socket
 
 %{__install} -d -m 0755 %{buildroot}%{_sysconfdir}/sysconfig
 %{__install} -p -m 0644 %{SOURCE11} \
@@ -163,10 +165,10 @@ do
 done
 
 %post
-%systemd_post gpsd.service
+%systemd_post gpsd.service gpsd.socket
 
 %preun
-%systemd_preun gpsd.service
+%systemd_preun gpsd.service gpsd.socket
 
 %postun
 # Don't restart the service
@@ -186,6 +188,7 @@ done
 %{_bindir}/gpsmon
 %{_bindir}/gpsctl
 %{_unitdir}/gpsd.service
+%{_unitdir}/gpsd.socket
 %{_udevrulesdir}/*.rules
 %{_prefix}/lib/udev/gpsd*
 %{_mandir}/man8/gpsd.8*
