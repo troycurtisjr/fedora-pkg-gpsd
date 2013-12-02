@@ -1,3 +1,3 @@
-OPTIONS="-n"
+OPTIONS=""
 DEVICE="/dev/ttyUSB0"
 USBAUTO="true"
