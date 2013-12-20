@@ -2,7 +2,7 @@
 
 Name: gpsd
 Version: 3.10
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -246,6 +246,11 @@ done
 
 
 %changelog
+* Fri Dec 20 2013 Miroslav Lichvar <mlichvar@redhat.com> - 3.10-2
+- use systemd socket activation (#909563)
+- don't use -n in default gpsd service options
+- update gpsd service file
+
 * Mon Nov 25 2013 Miroslav Lichvar <mlichvar@redhat.com> - 3.10-1
 - update to 3.10
 - move udev rules from /etc to /usr/lib (#971851)
