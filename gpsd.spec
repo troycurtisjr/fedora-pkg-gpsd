@@ -82,7 +82,7 @@ export CCFLAGS="%{optflags}"
 export LINKFLAGS="%{__global_ldflags}"
 # breaks with %{_smp_mflags}
 scons \
-	dbus=yes \
+	dbus_export=yes \
 	systemd=yes \
 	libQgpsmm=no \
 	debug=yes \
