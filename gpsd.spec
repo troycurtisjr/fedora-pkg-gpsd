@@ -1,4 +1,5 @@
 %global _hardened_build 1
+%global gitrev 20140127gitf2753b
 
 Name: gpsd
 Version: 3.10
@@ -8,18 +9,11 @@ Summary: Service daemon for mediating access to a GPS
 Group: System Environment/Daemons
 License: BSD
 URL: http://catb.org/gpsd/
-Source0: http://download.savannah.gnu.org/releases/gpsd/%{name}-%{version}.tar.gz
+#Source0: http://download.savannah.gnu.org/releases/gpsd/%{name}-%{version}.tar.gz
+Source0: gpsd-%{gitrev}.tar.gz
 Source10: gpsd.service
 Source11: gpsd.sysconfig
 Source12: gpsdctl.service
-# PPS seems to be working without cap_sys_time
-Patch1: gpsd-nolibcap.patch
-# allow multiple options in LINKFLAGS
-Patch2: gpsd-linkflags.patch
-# set time stamp in chrony SOCK sample correctly
-Patch3: gpsd-chronyts.patch
-# drop also supplementary groups when dropping privileges
-Patch4: gpsd-setgroups.patch
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
 BuildRequires: scons desktop-file-utils bluez-libs-devel pps-tools-devel
@@ -81,11 +75,7 @@ can run on a serial terminal or terminal emulator.
 
 
 %prep
-%setup -q
-%patch1 -p1 -b .nolibcap
-%patch2 -p1 -b .linkflags
-%patch3 -p1 -b .chronyts
-%patch4 -p1 -b .setgroups
+%setup -q -n %{name}
 
 %build
 export CCFLAGS="%{optflags}"
