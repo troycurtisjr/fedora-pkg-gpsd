@@ -11,6 +11,7 @@ URL: http://catb.org/gpsd/
 Source0: http://download.savannah.gnu.org/releases/gpsd/%{name}-%{version}.tar.gz
 Source10: gpsd.service
 Source11: gpsd.sysconfig
+Source12: gpsdctl.service
 # PPS seems to be working without cap_sys_time
 Patch1: gpsd-nolibcap.patch
 # allow multiple options in LINKFLAGS
@@ -118,6 +119,8 @@ DESTDIR=%{buildroot} scons install
 %{__install} -d -m 0755 %{buildroot}%{_unitdir}
 %{__install} -p -m 0644 %{SOURCE10} \
 	%{buildroot}%{_unitdir}/gpsd.service
+%{__install} -p -m 0644 %{SOURCE12} \
+	%{buildroot}%{_unitdir}/gpsdctl@.service
 %{__install} -p -m 0644 systemd/gpsd.socket \
 	%{buildroot}%{_unitdir}/gpsd.socket
 
@@ -130,9 +133,9 @@ DESTDIR=%{buildroot} scons install
 %{__install} -p -m 0644 gpsd.rules \
 	%{buildroot}%{_udevrulesdir}/99-gpsd.rules
 
-# hotplug script
-%{__install} -d -m 0755 %{buildroot}%{_prefix}/lib/udev
-%{__install} -p -m 0755 gpsd.hotplug %{buildroot}%{_prefix}/lib/udev
+# Use gpsdctl service instead of hotplug script
+sed -i 's|RUN+="/lib/udev/gpsd.hotplug"|TAG+="systemd", ENV{SYSTEMD_WANTS}="gpsdctl@%k.service"|' \
+	%{buildroot}%{_udevrulesdir}/99-gpsd.rules
 
 # Install the .desktop files
 desktop-file-install \
@@ -189,8 +192,8 @@ done
 %{_bindir}/gpsctl
 %{_unitdir}/gpsd.service
 %{_unitdir}/gpsd.socket
+%{_unitdir}/gpsdctl@.service
 %{_udevrulesdir}/*.rules
-%{_prefix}/lib/udev/gpsd*
 %{_mandir}/man8/gpsd.8*
 %{_mandir}/man8/gpsdctl.8*
 %{_mandir}/man8/gpsinit.8*
