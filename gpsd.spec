@@ -3,7 +3,7 @@
 
 Name: gpsd
 Version: 3.10
-Release: 2%{?dist}
+Release: 3.%{gitrev}%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -239,6 +239,12 @@ done
 
 
 %changelog
+* Thu Feb 20 2014 Miroslav Lichvar <mlichvar@redhat.com> - 3.10-3.20140127gitf2753b
+- update to 20140127gitf2753b
+- replace udev hotplug script with gpsdctl service (#909563)
+- add dependency on gpsd.socket to gpsd.service
+- reenable dbus export
+
 * Fri Dec 20 2013 Miroslav Lichvar <mlichvar@redhat.com> - 3.10-2
 - use systemd socket activation (#909563)
 - don't use -n in default gpsd service options
