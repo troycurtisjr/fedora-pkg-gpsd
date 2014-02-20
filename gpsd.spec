@@ -17,7 +17,6 @@ Source12: gpsdctl.service
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
 BuildRequires: scons desktop-file-utils bluez-libs-devel pps-tools-devel
-BuildRequires: chrpath
 %ifnarch s390 s390x
 BuildRequires: libusb1-devel
 %endif
@@ -76,6 +75,9 @@ can run on a serial terminal or terminal emulator.
 
 %prep
 %setup -q -n %{name}
+
+# fix RPATH
+sed -i 's|sysrpath =.*|sysrpath = ["%{_libdir}"]|' SConstruct
 
 %build
 export CCFLAGS="%{optflags}"
@@ -144,18 +146,6 @@ desktop-file-install \
 
 # Not needed since gpsd.h is not installed
 rm %{buildroot}%{_libdir}/{libgpsd.so,pkgconfig/libgpsd.pc}
-
-# Remove RPATH (even the actual string)
-for i in \
-	%{buildroot}%{_bindir}/gps{mon,ctl,2udp,decode,pipe} \
-	%{buildroot}%{_bindir}/{lcdgps,cgps,gpxlogger} \
-	%{buildroot}%{_sbindir}/gpsd{,ctl} \
-	%{buildroot}%{_libdir}/libgps{,d}.so.*.*.* \
-	%{buildroot}%{python_sitearch}/gps/*.so
-do
-	chrpath -r "" $i
-	chrpath -d $i
-done
 
 %post
 %systemd_post gpsd.service gpsd.socket
