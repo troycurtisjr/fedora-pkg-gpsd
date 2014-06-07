@@ -3,7 +3,7 @@
 
 Name: gpsd
 Version: 3.10
-Release: 3.%{gitrev}%{?dist}
+Release: 4.%{gitrev}%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -229,6 +229,9 @@ rm %{buildroot}%{_libdir}/{libgpsd.so,pkgconfig/libgpsd.pc}
 
 
 %changelog
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.10-4.20140127gitf2753b
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
 * Thu Feb 20 2014 Miroslav Lichvar <mlichvar@redhat.com> - 3.10-3.20140127gitf2753b
 - update to 20140127gitf2753b
 - replace udev hotplug script with gpsdctl service (#909563)
