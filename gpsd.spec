@@ -80,6 +80,10 @@ can run on a serial terminal or terminal emulator.
 %setup -q -n %{name}
 %patch1 -p1 -b .ppsoffset
 
+# set gpsd revision string to include package revision
+sed -i 's|^revision=.*REVISION.*$|revision='\'\
+'#define REVISION "%{version}-%{release}'\"\'\| SConstruct
+
 # fix RPATH
 sed -i 's|sysrpath =.*|sysrpath = ["%{_libdir}"]|' SConstruct
 
