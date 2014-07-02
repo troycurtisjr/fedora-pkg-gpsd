@@ -15,6 +15,9 @@ Source10: gpsd.service
 Source11: gpsd.sysconfig
 Source12: gpsdctl.service
 
+# Fix PPS with large offsets
+Patch1: gpsd-ppsoffset.patch
+
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
 BuildRequires: scons desktop-file-utils bluez-libs-devel pps-tools-devel
 %ifnarch s390 s390x
@@ -75,6 +78,7 @@ can run on a serial terminal or terminal emulator.
 
 %prep
 %setup -q -n %{name}
+%patch1 -p1 -b .ppsoffset
 
 # fix RPATH
 sed -i 's|sysrpath =.*|sysrpath = ["%{_libdir}"]|' SConstruct
