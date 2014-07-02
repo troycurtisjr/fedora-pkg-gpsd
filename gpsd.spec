@@ -1,5 +1,5 @@
 %global _hardened_build 1
-%global gitrev 20140127gitf2753b
+%global gitrev 20140524gitd6b65b
 
 Name: gpsd
 Version: 3.10
