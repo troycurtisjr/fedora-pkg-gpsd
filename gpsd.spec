@@ -3,7 +3,7 @@
 
 Name: gpsd
 Version: 3.10
-Release: 5.%{gitrev}%{?dist}
+Release: 6.%{gitrev}%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -237,6 +237,9 @@ rm %{buildroot}%{_libdir}/{libgpsd.so,pkgconfig/libgpsd.pc}
 
 
 %changelog
+* Sat Aug 16 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.10-6.20140524gitd6b65b
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
+
 * Wed Jul 02 2014 Miroslav Lichvar <mlichvar@redhat.com> - 3.10-5.20140524gitd6b65b
 - update to 20140524gitd6b65b
 - fix PPS with large offsets
