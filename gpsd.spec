@@ -222,6 +222,9 @@ rm %{buildroot}%{_libdir}/{libgpsd.so,pkgconfig/libgpsd.pc}
 
 
 %changelog
+* Mon Aug 25 2014 Miroslav Lichvar <mlichvar@redhat.com> - 3.11-1
+- update to 3.11
+
 * Sat Aug 16 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.10-6.20140524gitd6b65b
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
