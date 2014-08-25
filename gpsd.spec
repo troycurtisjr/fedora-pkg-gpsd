@@ -1,22 +1,18 @@
 %global _hardened_build 1
-%global gitrev 20140524gitd6b65b
 
 Name: gpsd
-Version: 3.10
-Release: 6.%{gitrev}%{?dist}
+Version: 3.11
+Release: 1%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
 License: BSD
 URL: http://catb.org/gpsd/
-#Source0: http://download.savannah.gnu.org/releases/gpsd/%{name}-%{version}.tar.gz
-Source0: gpsd-%{gitrev}.tar.gz
-Source10: gpsd.service
+Source0: http://download.savannah.gnu.org/releases/gpsd/%{name}-%{version}.tar.gz
 Source11: gpsd.sysconfig
-Source12: gpsdctl.service
 
-# Fix PPS with large offsets
-Patch1: gpsd-ppsoffset.patch
+# Update systemd files
+Patch1: gpsd-systemd.patch
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
 BuildRequires: scons desktop-file-utils bluez-libs-devel pps-tools-devel
@@ -77,15 +73,18 @@ can run on a serial terminal or terminal emulator.
 
 
 %prep
-%setup -q -n %{name}
-%patch1 -p1 -b .ppsoffset
+%setup -q
+%patch1 -p1 -b .systemd
 
 # set gpsd revision string to include package revision
 sed -i 's|^revision=.*REVISION.*$|revision='\'\
 '#define REVISION "%{version}-%{release}'\"\'\| SConstruct
 
-# fix RPATH
-sed -i 's|sysrpath =.*|sysrpath = ["%{_libdir}"]|' SConstruct
+# fix systemd path
+sed -i 's|systemd_dir =.*|systemd_dir = '\'%{_unitdir}\''|' SConstruct
+
+# don't set RPATH
+sed -i 's|env.Prepend.*RPATH.*|pass #\0|' SConstruct
 
 %build
 export CCFLAGS="%{optflags}"
@@ -106,6 +105,7 @@ scons \
 	mandir=%{_mandir} \
 	docdir=%{_docdir} \
 	pkgconfigdir=%{_libdir}/pkgconfig \
+	udevdir=$(dirname %{_udevrulesdir}) \
 	build
 
 
@@ -113,29 +113,14 @@ scons \
 # avoid rebuilding
 export CCFLAGS="%{optflags}"
 export LINKFLAGS="%{__global_ldflags}"
-DESTDIR=%{buildroot} scons install
+DESTDIR=%{buildroot} scons install systemd_install udev-install
 
-# service files
-%{__install} -d -m 0755 %{buildroot}%{_unitdir}
-%{__install} -p -m 0644 %{SOURCE10} \
-	%{buildroot}%{_unitdir}/gpsd.service
-%{__install} -p -m 0644 %{SOURCE12} \
-	%{buildroot}%{_unitdir}/gpsdctl@.service
-%{__install} -p -m 0644 systemd/gpsd.socket \
-	%{buildroot}%{_unitdir}/gpsd.socket
+# use the old name for udev rules
+mv %{buildroot}%{_udevrulesdir}/{25,99}-gpsd.rules
 
 %{__install} -d -m 0755 %{buildroot}%{_sysconfdir}/sysconfig
 %{__install} -p -m 0644 %{SOURCE11} \
 	%{buildroot}%{_sysconfdir}/sysconfig/gpsd
-
-# udev rules
-%{__install} -d -m 0755 %{buildroot}%{_udevrulesdir}
-%{__install} -p -m 0644 gpsd.rules \
-	%{buildroot}%{_udevrulesdir}/99-gpsd.rules
-
-# Use gpsdctl service instead of hotplug script
-sed -i 's|RUN+="/lib/udev/gpsd.hotplug"|TAG+="systemd", ENV{SYSTEMD_WANTS}="gpsdctl@%k.service"|' \
-	%{buildroot}%{_udevrulesdir}/99-gpsd.rules
 
 # Install the .desktop files
 desktop-file-install \
