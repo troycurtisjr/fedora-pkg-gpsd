@@ -1,7 +1,7 @@
 %global _hardened_build 1
 
 Name: gpsd
-Version: 3.11
+Version: 3.13
 Release: 1%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
@@ -10,9 +10,6 @@ License: BSD
 URL: http://catb.org/gpsd/
 Source0: http://download.savannah.gnu.org/releases/gpsd/%{name}-%{version}.tar.gz
 Source11: gpsd.sysconfig
-
-# Update systemd files
-Patch1: gpsd-systemd.patch
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
 BuildRequires: scons desktop-file-utils bluez-libs-devel pps-tools-devel
@@ -74,7 +71,6 @@ can run on a serial terminal or terminal emulator.
 
 %prep
 %setup -q
-%patch1 -p1 -b .systemd
 
 # set gpsd revision string to include package revision
 sed -i 's|^revision=.*REVISION.*$|revision='\'\
@@ -139,6 +135,8 @@ desktop-file-install \
 
 # Not needed since gpsd.h is not installed
 rm %{buildroot}%{_libdir}/{libgpsd.so,pkgconfig/libgpsd.pc}
+
+rm %{buildroot}%{_mandir}/man1/ntpmon*
 
 %post
 %systemd_post gpsd.service gpsd.socket
