@@ -220,6 +220,9 @@ rm %{buildroot}%{_mandir}/man1/ntpmon*
 
 
 %changelog
+* Mon Mar 02 2015 Miroslav Lichvar <mlichvar@redhat.com> - 3.13-1
+- update to 3.13
+
 * Mon Aug 25 2014 Miroslav Lichvar <mlichvar@redhat.com> - 3.11-1
 - update to 3.11
 
