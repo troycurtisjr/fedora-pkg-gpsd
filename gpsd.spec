@@ -2,7 +2,7 @@
 
 Name: gpsd
 Version: 3.13
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -173,15 +173,16 @@ rm %{buildroot}%{_mandir}/man1/ntpmon*
 %{_mandir}/man1/gpsctl.1*
 
 %files libs
-%{_libdir}/libgps*.so.*
+%{_libdir}/libgps.so.22*
+%{_libdir}/libgpsd.so.22*
 %{python_sitearch}/gps*
 %exclude %{python_sitearch}/gps/fake*
 
 %files devel
 %doc TODO
 %{_bindir}/gpsfake
-%{_libdir}/libgps*.so
-%{_libdir}/pkgconfig/*.pc
+%{_libdir}/libgps.so
+%{_libdir}/pkgconfig/libgps.pc
 %{python_sitearch}/gps/fake*
 %{_includedir}/gps.h
 %{_includedir}/libgpsmm.h
@@ -220,6 +221,9 @@ rm %{buildroot}%{_mandir}/man1/ntpmon*
 
 
 %changelog
+* Fri Mar 06 2015 Rex Dieter <rdieter@fedoraproject.org> 3.13-2
+- track library sonames and api files closer, so bumps aren't a surprise
+
 * Mon Mar 02 2015 Miroslav Lichvar <mlichvar@redhat.com> - 3.13-1
 - update to 3.13
 
