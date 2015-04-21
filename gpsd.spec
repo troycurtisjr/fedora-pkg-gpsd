@@ -1,7 +1,7 @@
 %global _hardened_build 1
 
 Name: gpsd
-Version: 3.13
+Version: 3.14
 Release: 2%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
@@ -136,8 +136,6 @@ desktop-file-install \
 # Not needed since gpsd.h is not installed
 rm %{buildroot}%{_libdir}/{libgpsd.so,pkgconfig/libgpsd.pc}
 
-rm %{buildroot}%{_mandir}/man1/ntpmon*
-
 %post
 %systemd_post gpsd.service gpsd.socket
 
@@ -161,6 +159,7 @@ rm %{buildroot}%{_mandir}/man1/ntpmon*
 %{_bindir}/gpsprof
 %{_bindir}/gpsmon
 %{_bindir}/gpsctl
+%{_bindir}/ntpshmmon
 %{_unitdir}/gpsd.service
 %{_unitdir}/gpsd.socket
 %{_unitdir}/gpsdctl@.service
@@ -171,6 +170,7 @@ rm %{buildroot}%{_mandir}/man1/ntpmon*
 %{_mandir}/man1/gpsprof.1*
 %{_mandir}/man1/gpsmon.1*
 %{_mandir}/man1/gpsctl.1*
+%{_mandir}/man1/ntpshmmon.1*
 
 %files libs
 %{_libdir}/libgps.so.22*
