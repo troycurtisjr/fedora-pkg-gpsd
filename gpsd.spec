@@ -2,7 +2,7 @@
 
 Name: gpsd
 Version: 3.14
-Release: 2%{?dist}
+Release: 1%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -221,6 +221,9 @@ rm %{buildroot}%{_libdir}/{libgpsd.so,pkgconfig/libgpsd.pc}
 
 
 %changelog
+* Tue Apr 21 2015 Miroslav Lichvar <mlichvar@redhat.com> - 3.14-1
+- update to 3.14
+
 * Fri Mar 06 2015 Rex Dieter <rdieter@fedoraproject.org> 3.13-2
 - track library sonames and api files closer, so bumps aren't a surprise
 
