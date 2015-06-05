@@ -1,7 +1,7 @@
 %global _hardened_build 1
 
 Name: gpsd
-Version: 3.14
+Version: 3.15
 Release: 1%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
@@ -134,7 +134,7 @@ desktop-file-install \
 %{__install} -p -m 0755 gpsinit %{buildroot}%{_sbindir}
 
 # Not needed since gpsd.h is not installed
-rm %{buildroot}%{_libdir}/{libgpsd.so,pkgconfig/libgpsd.pc}
+rm %{buildroot}%{_libdir}/pkgconfig/libgpsd.pc
 
 %post
 %systemd_post gpsd.service gpsd.socket
@@ -174,7 +174,6 @@ rm %{buildroot}%{_libdir}/{libgpsd.so,pkgconfig/libgpsd.pc}
 
 %files libs
 %{_libdir}/libgps.so.22*
-%{_libdir}/libgpsd.so.22*
 %{python_sitearch}/gps*
 %exclude %{python_sitearch}/gps/fake*
 
@@ -190,7 +189,6 @@ rm %{buildroot}%{_libdir}/{libgpsd.so,pkgconfig/libgpsd.pc}
 %{_mandir}/man3/libgps.3*
 %{_mandir}/man3/libQgpsmm.3*
 %{_mandir}/man3/libgpsmm.3*
-%{_mandir}/man3/libgpsd.3*
 %{_mandir}/man5/gpsd_json.5*
 %{_mandir}/man5/srec.5*
 
