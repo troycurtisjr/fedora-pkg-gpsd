@@ -219,6 +219,9 @@ rm %{buildroot}%{_libdir}/pkgconfig/libgpsd.pc
 
 
 %changelog
+* Fri Jun 05 2015 Miroslav Lichvar <mlichvar@redhat.com> - 3.15-1
+- update to 3.15
+
 * Tue Apr 21 2015 Miroslav Lichvar <mlichvar@redhat.com> - 3.14-1
 - update to 3.14
 
