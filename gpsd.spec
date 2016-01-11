@@ -1,7 +1,7 @@
 %global _hardened_build 1
 
 Name: gpsd
-Version: 3.15
+Version: 3.16
 Release: 2%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
@@ -78,6 +78,9 @@ sed -i 's|^revision=.*REVISION.*$|revision='\'\
 
 # fix systemd path
 sed -i 's|systemd_dir =.*|systemd_dir = '\'%{_unitdir}\''|' SConstruct
+
+# don't try reloading systemd when installing in the build root
+sed -i 's|systemctl daemon-reload|true|' SConstruct
 
 # don't set RPATH
 sed -i 's|env.Prepend.*RPATH.*|pass #\0|' SConstruct
