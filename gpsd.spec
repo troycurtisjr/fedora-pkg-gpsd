@@ -2,7 +2,7 @@
 
 Name: gpsd
 Version: 3.16
-Release: 2%{?dist}
+Release: 1%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -222,6 +222,9 @@ rm %{buildroot}%{_libdir}/pkgconfig/libgpsd.pc
 
 
 %changelog
+* Mon Jan 11 2016 Miroslav Lichvar <mlichvar@redhat.com> - 3.16-1
+- update to 3.16
+
 * Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 3.15-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 
