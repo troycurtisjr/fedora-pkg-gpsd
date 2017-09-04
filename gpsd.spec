@@ -1,8 +1,9 @@
 %global _hardened_build 1
+%global srcname gpsd
 
-Name: gpsd
+Name: %{srcname}
 Version: 3.16
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
@@ -11,7 +12,7 @@ URL: http://catb.org/gpsd/
 Source0: http://download.savannah.gnu.org/releases/gpsd/%{name}-%{version}.tar.gz
 Source11: gpsd.sysconfig
 
-BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python-devel
+BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python2-devel
 BuildRequires: scons desktop-file-utils bluez-libs-devel pps-tools-devel
 %ifnarch s390 s390x
 BuildRequires: libusb1-devel
@@ -34,12 +35,22 @@ gpsd responds to queries with a format that is substantially easier to
 parse than NMEA 0183.  
 
 %package libs
-Summary: Client libraries in C and Python for talking to a running gpsd or GPS
+Summary: Client libraries in C for talking to a running gpsd or GPS
 Group: System Environment/Libraries
 
 %description libs
-This package contains the gpsd libraries and python modules that manage access
+This package contains the gpsd libraries that manage access
 to a GPS for applications.
+
+%package -n python2-%{srcname}
+Summary: Python libraries and modules for use with gpsd
+Group: System Environment/Libraries
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+%{?python_provide:%python_provide python-%{srcname}}
+
+%description -n python2-%{srcname}
+This package contains the python modules that manage access to a GPS for
+applications, and commonly useful python applications for use with gpsd.
 
 %package devel
 Summary: Development files for the gpsd library
@@ -48,12 +59,14 @@ Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 Requires: pkgconfig
 
 %description devel
-This package provides C header files and python modules for the gpsd shared 
-libraries that manage access to a GPS for applications
+This package provides C header files for the gpsd shared libraries that
+manage access to a GPS for applications
 
 %package clients
 Summary: Clients for gpsd
 Group: Applications/System
+Requires: python2-%{srcname} = %{version}-%{release}
+Requires: %{srcname}-libs%{?_isa} = %{version}-%{release}
 
 %description clients
 xgps is a simple test client for gpsd with an X interface. It displays
@@ -67,6 +80,9 @@ to dump the package version and exit. Additionally, it accepts -rv
 
 cgps resembles xgps, but without the pictorial satellite display.  It
 can run on a serial terminal or terminal emulator.
+
+gpsfake can feed data from files to simulate data coming from many
+different gps devices.
 
 
 %prep
@@ -159,7 +175,6 @@ rm %{buildroot}%{_libdir}/pkgconfig/libgpsd.pc
 %{_sbindir}/gpsd
 %{_sbindir}/gpsdctl
 %{_sbindir}/gpsinit
-%{_bindir}/gpsprof
 %{_bindir}/gpsmon
 %{_bindir}/gpsctl
 %{_bindir}/ntpshmmon
@@ -170,25 +185,25 @@ rm %{buildroot}%{_libdir}/pkgconfig/libgpsd.pc
 %{_mandir}/man8/gpsd.8*
 %{_mandir}/man8/gpsdctl.8*
 %{_mandir}/man8/gpsinit.8*
-%{_mandir}/man1/gpsprof.1*
 %{_mandir}/man1/gpsmon.1*
 %{_mandir}/man1/gpsctl.1*
 %{_mandir}/man1/ntpshmmon.1*
 
 %files libs
 %{_libdir}/libgps.so.22*
+
+%files -n python2-%{srcname}
+%{_bindir}/gpsprof
+%{_mandir}/man1/gpsprof.1*
 %{python_sitearch}/gps*
 %exclude %{python_sitearch}/gps/fake*
 
 %files devel
 %doc TODO
-%{_bindir}/gpsfake
 %{_libdir}/libgps.so
 %{_libdir}/pkgconfig/libgps.pc
-%{python_sitearch}/gps/fake*
 %{_includedir}/gps.h
 %{_includedir}/libgpsmm.h
-%{_mandir}/man1/gpsfake.1*
 %{_mandir}/man3/libgps.3*
 %{_mandir}/man3/libQgpsmm.3*
 %{_mandir}/man3/libgpsmm.3*
@@ -206,6 +221,7 @@ rm %{buildroot}%{_libdir}/pkgconfig/libgpsd.pc
 %{_bindir}/lcdgps
 %{_bindir}/xgps
 %{_bindir}/xgpsspeed
+%{_bindir}/gpsfake
 %{_mandir}/man1/gegps.1*
 %{_mandir}/man1/gps.1*
 %{_mandir}/man1/gps2udp.1*
@@ -216,12 +232,17 @@ rm %{buildroot}%{_libdir}/pkgconfig/libgpsd.pc
 %{_mandir}/man1/xgpsspeed.1*
 %{_mandir}/man1/cgps.1*
 %{_mandir}/man1/gpscat.1*
+%{_mandir}/man1/gpsfake.1*
 %{_datadir}/applications/*.desktop
 %dir %{_datadir}/gpsd
 %{_datadir}/gpsd/gpsd-logo.png
+%{python_sitearch}/gps/fake*
 
 
 %changelog
+* Sun Sep 03 2017 Troy Curtis, Jr <troycurtisjr@gmail.com>
+- Split python files into python2 package.
+
 * Wed Aug 02 2017 Fedora Release Engineering <releng@fedoraproject.org> - 3.16-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
