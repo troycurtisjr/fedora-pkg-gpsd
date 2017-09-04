@@ -29,7 +29,7 @@ gpsd is a service daemon that mediates access to a GPS sensor
 connected to the host computer by serial or USB interface, making its
 data on the location/course/velocity of the sensor available to be
 queried on TCP port 2947 of the host computer.  With gpsd, multiple
-GPS client applications (such as navigational and wardriving software)
+GPS client applications (such as navigational and war-driving software)
 can share access to a GPS without contention or loss of data.  Also,
 gpsd responds to queries with a format that is substantially easier to
 parse than NMEA 0183.  
@@ -123,6 +123,9 @@ scons \
 	udevdir=$(dirname %{_udevrulesdir}) \
 	build
 
+# Fix python interpreter path.
+sed -e 's,#!/usr/bin/env \+python2\?,#!/usr/bin/python2,g' -i \
+    gegps gpscat gpsfake xgps xgpsspeed gpsprof gps/*.py
 
 %install
 # avoid rebuilding
@@ -240,7 +243,7 @@ rm %{buildroot}%{_libdir}/pkgconfig/libgpsd.pc
 
 
 %changelog
-* Sun Sep 03 2017 Troy Curtis, Jr <troycurtisjr@gmail.com>
+* Sun Sep 03 2017 Troy Curtis, Jr <troycurtisjr@gmail.com> - 3.16-7
 - Split python files into python2 package.
 
 * Wed Aug 02 2017 Fedora Release Engineering <releng@fedoraproject.org> - 3.16-6
