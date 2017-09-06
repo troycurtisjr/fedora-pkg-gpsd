@@ -2,14 +2,15 @@
 %global srcname gpsd
 
 Name: %{srcname}
-Version: 3.16
-Release: 7%{?dist}
+Version: 3.17
+Release: 1%{?dist}
 Summary: Service daemon for mediating access to a GPS
 
 Group: System Environment/Daemons
 License: BSD
 URL: http://catb.org/gpsd/
-Source0: http://download.savannah.gnu.org/releases/gpsd/%{name}-%{version}.tar.gz
+#Source0: http://download.savannah.gnu.org/releases/gpsd/%{name}-%{version}.tar.gz
+Source0: %{name}-%{version}.tar.gz
 Source11: gpsd.sysconfig
 
 BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python2-devel
@@ -121,6 +122,8 @@ scons \
 	docdir=%{_docdir} \
 	pkgconfigdir=%{_libdir}/pkgconfig \
 	udevdir=$(dirname %{_udevrulesdir}) \
+  target_python=python2 \
+  python_libdir=%{python2_sitearch} \
 	build
 
 # Fix python interpreter path.
@@ -154,9 +157,6 @@ desktop-file-install \
 
 # Missed in scons install 
 %{__install} -p -m 0755 gpsinit %{buildroot}%{_sbindir}
-
-# Not needed since gpsd.h is not installed
-rm %{buildroot}%{_libdir}/pkgconfig/libgpsd.pc
 
 %post
 %systemd_post gpsd.service gpsd.socket
@@ -193,7 +193,7 @@ rm %{buildroot}%{_libdir}/pkgconfig/libgpsd.pc
 %{_mandir}/man1/ntpshmmon.1*
 
 %files libs
-%{_libdir}/libgps.so.22*
+%{_libdir}/libgps.so.23*
 
 %files -n python2-%{srcname}
 %{_bindir}/gpsprof
@@ -225,17 +225,20 @@ rm %{buildroot}%{_libdir}/pkgconfig/libgpsd.pc
 %{_bindir}/xgps
 %{_bindir}/xgpsspeed
 %{_bindir}/gpsfake
+%{_bindir}/ppscheck
 %{_mandir}/man1/gegps.1*
 %{_mandir}/man1/gps.1*
 %{_mandir}/man1/gps2udp.1*
 %{_mandir}/man1/gpsdecode.1*
 %{_mandir}/man1/gpspipe.1*
+%{_mandir}/man1/gpxlogger.1*
 %{_mandir}/man1/lcdgps.1*
 %{_mandir}/man1/xgps.1*
 %{_mandir}/man1/xgpsspeed.1*
 %{_mandir}/man1/cgps.1*
 %{_mandir}/man1/gpscat.1*
 %{_mandir}/man1/gpsfake.1*
+%{_mandir}/man8/ppscheck.8*
 %{_datadir}/applications/*.desktop
 %dir %{_datadir}/gpsd
 %{_datadir}/gpsd/gpsd-logo.png
@@ -243,6 +246,10 @@ rm %{buildroot}%{_libdir}/pkgconfig/libgpsd.pc
 
 
 %changelog
+* Tue Sep 05 2017 Troy Curtis, Jr <troycurtisjr@gmail.com> - 3.17-1
+- Update to 3.17
+- Build both python2 and python3 files
+
 * Sun Sep 03 2017 Troy Curtis, Jr <troycurtisjr@gmail.com> - 3.16-7
 - Split python files into python2 package.
 
