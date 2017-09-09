@@ -1,6 +1,8 @@
 %global _hardened_build 1
 %global srcname gpsd
 
+%global with_qt 1
+
 Name: %{srcname}
 Version: 3.17
 Release: 1%{?dist}
@@ -9,12 +11,14 @@ Summary: Service daemon for mediating access to a GPS
 Group: System Environment/Daemons
 License: BSD
 URL: http://catb.org/gpsd/
-#Source0: http://download.savannah.gnu.org/releases/gpsd/%{name}-%{version}.tar.gz
-Source0: %{name}-%{version}.tar.gz
+Source0: http://download-mirror.savannah.gnu.org/releases/gpsd/%{name}-%{version}.tar.gz
 Source11: gpsd.sysconfig
 
-BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python2-devel
-BuildRequires: scons desktop-file-utils bluez-libs-devel pps-tools-devel
+BuildRequires: dbus-devel dbus-glib-devel ncurses-devel xmlto python2-devel python3-devel
+BuildRequires: scons desktop-file-utils bluez-libs-devel pps-tools-devel /usr/bin/c++
+%if %{with_qt}
+BuildRequires: qt-devel
+%endif
 %ifnarch s390 s390x
 BuildRequires: libusb1-devel
 %endif
@@ -47,26 +51,56 @@ to a GPS for applications.
 Summary: Python libraries and modules for use with gpsd
 Group: System Environment/Libraries
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
-%{?python_provide:%python_provide python-%{srcname}}
+%{?python_provide:%python_provide python2-%{srcname}}
 
 %description -n python2-%{srcname}
-This package contains the python modules that manage access to a GPS for
+This package contains the python2 modules that manage access to a GPS for
+applications, and commonly useful python applications for use with gpsd.
+
+%package -n python3-%{srcname}
+Summary: Python libraries and modules for use with gpsd
+Group: System Environment/Libraries
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+%{?python_provide:%python_provide python3-%{srcname}}
+
+%description -n python3-%{srcname}
+This package contains the python3 modules that manage access to a GPS for
 applications, and commonly useful python applications for use with gpsd.
 
 %package devel
 Summary: Development files for the gpsd library
 Group: Development/Libraries
 Requires: %{name}-libs%{?_isa} = %{version}-%{release}
-Requires: pkgconfig
 
 %description devel
 This package provides C header files for the gpsd shared libraries that
 manage access to a GPS for applications
 
+%if %{with_qt}
+%package qt
+Summary: C++/Qt5 bindings for the gpsd library
+Group: System Environment/Libraries
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+
+%description qt
+This package provide C++ and Qt bindings for use with the libgps library from
+gpsd.
+
+%package qt-devel
+Summary: Development files for the C++/Qt5 bindings for the gpsd library
+Group: System Environment/Libraries
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+Requires: %{name}-qt%{?_isa} = %{version}-%{release}
+
+%description qt-devel
+This package provides the development files for the C++ and Qt bindings for use
+with the libgps library from gpsd.
+%endif
+
 %package clients
 Summary: Clients for gpsd
 Group: Applications/System
-Requires: python2-%{srcname} = %{version}-%{release}
+Requires: python3-%{srcname} = %{version}-%{release}
 Requires: %{srcname}-libs%{?_isa} = %{version}-%{release}
 
 %description clients
@@ -87,53 +121,87 @@ different gps devices.
 
 
 %prep
-%setup -q
+rm -fr %{srcname}-%{version}
+mkdir -p %{srcname}-%{version}/python2
+mkdir -p %{srcname}-%{version}/python3
+
+tar -xf %{SOURCE0} -C %{srcname}-%{version}/python2
+tar -xf %{SOURCE0} -C %{srcname}-%{version}/python3
+
+cd %{srcname}-%{version}
 
 # set gpsd revision string to include package revision
 sed -i 's|^revision=.*REVISION.*$|revision='\'\
-'#define REVISION "%{version}-%{release}'\"\'\| SConstruct
+'#define REVISION "%{version}-%{release}'\"\'\| python*/%{srcname}-%{version}/SConstruct
 
 # fix systemd path
-sed -i 's|systemd_dir =.*|systemd_dir = '\'%{_unitdir}\''|' SConstruct
+sed -i 's|systemd_dir =.*|systemd_dir = '\'%{_unitdir}\''|' python*/%{srcname}-%{version}/SConstruct
 
 # don't try reloading systemd when installing in the build root
-sed -i 's|systemctl daemon-reload|true|' SConstruct
+sed -i 's|systemctl daemon-reload|true|' python*/%{srcname}-%{version}/SConstruct
 
 # don't set RPATH
-sed -i 's|env.Prepend.*RPATH.*|pass #\0|' SConstruct
+sed -i 's|env.Prepend.*RPATH.*|pass #\0|' python*/%{srcname}-%{version}/SConstruct
 
 %build
 export CCFLAGS="%{optflags}"
 export LINKFLAGS="%{__global_ldflags}"
-# breaks with %{_smp_mflags}
-scons \
-	dbus_export=yes \
-	systemd=yes \
-	libQgpsmm=no \
-	debug=yes \
-	leapfetch=no \
-	prefix="" \
-	sysconfdif=%{_sysconfdir} \
-	bindir=%{_bindir} \
-	includedir=%{_includedir} \
-	libdir=%{_libdir} \
-	sbindir=%{_sbindir} \
-	mandir=%{_mandir} \
-	docdir=%{_docdir} \
-	pkgconfigdir=%{_libdir}/pkgconfig \
-	udevdir=$(dirname %{_udevrulesdir}) \
-  target_python=python2 \
-  python_libdir=%{python2_sitearch} \
-	build
 
-# Fix python interpreter path.
-sed -e 's,#!/usr/bin/env \+python2\?,#!/usr/bin/python2,g' -i \
-    gegps gpscat gpsfake xgps xgpsspeed gpsprof gps/*.py
+pyversions=( python2 python3 )
+pylibdir=( %{python2_sitearch} %{python3_sitearch} )
+
+for i in 0 1
+do
+    pushd %{srcname}-%{version}/${pyversions[i]}/%{srcname}-%{version}
+
+    # breaks with %{_smp_mflags}
+    scons \
+        dbus_export=yes \
+        systemd=yes \
+        %if %{with_qt}
+        libQgpsmm=yes \
+        %else
+        libQgpsmm=no \
+        %endif
+        debug=yes \
+        leapfetch=no \
+        prefix="" \
+        sysconfdif=%{_sysconfdir} \
+        bindir=%{_bindir} \
+        includedir=%{_includedir} \
+        libdir=%{_libdir} \
+        sbindir=%{_sbindir} \
+        mandir=%{_mandir} \
+        docdir=%{_docdir} \
+        pkgconfigdir=%{_libdir}/pkgconfig \
+        udevdir=$(dirname %{_udevrulesdir}) \
+        target_python=${pyversions[i]} \
+        python_libdir=${pylibdir[i]} \
+        build
+
+    # Fix python interpreter path.
+        sed -e "s,#!/usr/bin/\(python[23]\?\|env \+python[23]\?\),#!/usr/bin/${pyversions[i]},g" -i \
+        gegps gpscat gpsfake xgps xgpsspeed gpsprof gps/*.py
+
+    popd
+done
 
 %install
 # avoid rebuilding
 export CCFLAGS="%{optflags}"
 export LINKFLAGS="%{__global_ldflags}"
+
+# Install python2 first
+pushd %{srcname}-%{version}/python2/%{srcname}-%{version}
+
+DESTDIR=%{buildroot} scons install systemd_install udev-install
+
+# Now delete all the installed files except the python2 files
+find %{buildroot} \( -not -type d -a -not -path "*/python2.*/*" \) -delete
+
+popd
+pushd %{srcname}-%{version}/python3/%{srcname}-%{version}
+
 DESTDIR=%{buildroot} scons install systemd_install udev-install
 
 # use the old name for udev rules
@@ -141,15 +209,15 @@ mv %{buildroot}%{_udevrulesdir}/{25,99}-gpsd.rules
 
 %{__install} -d -m 0755 %{buildroot}%{_sysconfdir}/sysconfig
 %{__install} -p -m 0644 %{SOURCE11} \
-	%{buildroot}%{_sysconfdir}/sysconfig/gpsd
+  %{buildroot}%{_sysconfdir}/sysconfig/gpsd
 
 # Install the .desktop files
 desktop-file-install \
-	--dir %{buildroot}%{_datadir}/applications \
-	packaging/X11/xgps.desktop
+  --dir %{buildroot}%{_datadir}/applications \
+  packaging/X11/xgps.desktop
 desktop-file-install \
-	--dir %{buildroot}%{_datadir}/applications \
-	packaging/X11/xgpsspeed.desktop
+  --dir %{buildroot}%{_datadir}/applications \
+  packaging/X11/xgpsspeed.desktop
 
 # Install logo icon for .desktop files
 %{__install} -d -m 0755 %{buildroot}%{_datadir}/gpsd
@@ -157,6 +225,14 @@ desktop-file-install \
 
 # Missed in scons install 
 %{__install} -p -m 0755 gpsinit %{buildroot}%{_sbindir}
+
+# If qt build was disabled, clean up the files that may have been installed
+# anyway
+%if !%{with_qt}
+%{__rm} -f %{buildroot}%{_libdir}/libQgpsmm* \
+    %{buildroot}%{_libdir}/pkgconfig/Qgpsmm* \
+    %{buildroot}%{_mandir}/man3/libQgpsmm.3*
+%endif
 
 %post
 %systemd_post gpsd.service gpsd.socket
@@ -172,8 +248,14 @@ desktop-file-install \
 
 %postun libs -p /sbin/ldconfig
 
+%if %{with_qt}
+%post qt -p /sbin/ldconfig
+
+%postun qt -p /sbin/ldconfig
+%endif
+
 %files
-%doc README COPYING
+%doc %{name}-%{version}/python3/%{name}-%{version}/README %{name}-%{version}/python3/%{name}-%{version}/COPYING
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 %{_sbindir}/gpsd
 %{_sbindir}/gpsdctl
@@ -196,22 +278,37 @@ desktop-file-install \
 %{_libdir}/libgps.so.23*
 
 %files -n python2-%{srcname}
-%{_bindir}/gpsprof
-%{_mandir}/man1/gpsprof.1*
-%{python_sitearch}/gps*
+%{python2_sitearch}/gps*
 %exclude %{python_sitearch}/gps/fake*
 
+%files -n python3-%{srcname}
+%{_bindir}/gpsprof
+%{_mandir}/man1/gpsprof.1*
+%{python3_sitearch}/gps*
+%exclude %{python3_sitearch}/gps/fake*
+%exclude %{python3_sitearch}/gps/__pycache__/fake*
+
 %files devel
-%doc TODO
+%doc %{name}-%{version}/python3/%{name}-%{version}/TODO
 %{_libdir}/libgps.so
 %{_libdir}/pkgconfig/libgps.pc
 %{_includedir}/gps.h
 %{_includedir}/libgpsmm.h
 %{_mandir}/man3/libgps.3*
-%{_mandir}/man3/libQgpsmm.3*
 %{_mandir}/man3/libgpsmm.3*
 %{_mandir}/man5/gpsd_json.5*
 %{_mandir}/man5/srec.5*
+
+%if %{with_qt}
+%files qt
+%{_libdir}/libQgpsmm.so.23*
+
+%files qt-devel
+%{_libdir}/libQgpsmm.so
+%{_libdir}/libQgpsmm.prl
+%{_libdir}/pkgconfig/Qgpsmm.pc
+%{_mandir}/man3/libQgpsmm.3*
+%endif
 
 %files clients
 %{_bindir}/cgps
@@ -242,16 +339,15 @@ desktop-file-install \
 %{_datadir}/applications/*.desktop
 %dir %{_datadir}/gpsd
 %{_datadir}/gpsd/gpsd-logo.png
-%{python_sitearch}/gps/fake*
+%{python3_sitearch}/gps/fake*
+%{python3_sitearch}/gps/__pycache__/fake*
 
 
 %changelog
-* Tue Sep 05 2017 Troy Curtis, Jr <troycurtisjr@gmail.com> - 3.17-1
+* Fri Sep 08 2017 Troy Curtis, Jr <troycurtisjr@gmail.com> - 3.17-1
 - Update to 3.17
-- Build both python2 and python3 files
-
-* Sun Sep 03 2017 Troy Curtis, Jr <troycurtisjr@gmail.com> - 3.16-7
-- Split python files into python2 package.
+- Build both python2 and python3 files and install into separate subpackages.
+- Add Qt5 subpackage
 
 * Wed Aug 02 2017 Fedora Release Engineering <releng@fedoraproject.org> - 3.16-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
